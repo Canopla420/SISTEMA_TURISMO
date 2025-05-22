@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consultar, Modificar y Eliminar Visitas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/consultar_visitas.css') }}">
+</head>
+<body>
+    <div class="header">
+        <h1>Consultar, Modificar y Eliminar Visitas</h1>
+    </div>
+
+    <div class="container">
+        <h2>Visitas Registradas</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Institución</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for visita in visitas %}
+                <tr>
+                    <td>{{ visita.nombre_institucion }}</td>
+                    <td>{{ visita.fecha_visita }}</td>
+                    <td>{{ visita.estado }}</td>
+                    <td>
+                        {% if visita.estado == "Pendiente" %}
+                        <form action="/confirmar_visita/{{ visita.id }}" method="POST" style="display:inline;">
+                            <button type="submit" class="boton-confirmar">Confirmar</button>
+                        </form>
+                        {% elif visita.estado == "Confirmada" %}
+                        <form action="/rechazar_visita/{{ visita.id }}" method="POST" style="display:inline;">
+                            <button type="submit" class="boton-rechazar">Rechazar</button>
+                        </form>
+                        {% endif %}
+                        <form action="/modificar_visita/{{ visita.id }}" method="GET" style="display:inline;">
+                            <button type="submit" class="boton-modificar">Modificar</button>
+                        </form>
+                        <form action="/eliminar_visita/{{ visita.id }}" method="POST" style="display:inline;">
+                            <button type="submit" class="boton-eliminar">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="{{ url_for('index') }}" class="boton-volver">Volver al Menú</a>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/consultar_visitas.js') }}"></script>
+</body>
+</html>

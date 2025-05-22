@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitud de Visita</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/nueva_visita.css') }}">
+</head>
+<body>
+    <div class="header">
+        <h1>Formulario de Solicitud de Visita</h1>
+    </div>
+
+    <div class="container">
+        <form action="/institucion/solicitar_visita" method="POST" class="form-solicitud">
+            <!-- A. DATOS DE LA INSTITUCIÓN -->
+            <div class="section">
+                <h2>A. Datos de la Institución</h2>
+                <div class="form-group">
+                    <label for="nombre_institucion">Nombre completo de la institución educativa:</label>
+                    <input type="text" id="nombre_institucion" name="nombre_institucion" required>
+                </div>
+                <div class="form-group">
+                    <label for="localidad">Localidad:</label>
+                    <input type="text" id="localidad" name="localidad" required>
+                </div>
+                <div class="form-group">
+                    <label for="director">Nombre del director/a:</label>
+                    <input type="text" id="director" name="director" required>
+                </div>
+                <div class="form-group">
+                    <label for="correo_institucional">Correo electrónico institucional:</label>
+                    <input type="email" id="correo_institucional" name="correo_institucional" required>
+                </div>
+                <div class="form-group">
+                    <label for="telefono_institucion">Número de teléfono de la institución:</label>
+                    <input type="tel" id="telefono_institucion" name="telefono_institucion" required>
+                </div>
+            </div>
+
+            <!-- B. DATOS DEL CONTINGENTE -->
+            <div class="section">
+                <h2>B. Datos del Contingente</h2>
+                <div class="form-group">
+                    <label for="contacto_principal">Nombre completo del contacto principal:</label>
+                    <input type="text" id="contacto_principal" name="contacto_principal" required>
+                </div>
+                <div class="form-group">
+                    <label for="telefono_contacto_principal">Número de teléfono del contacto principal:</label>
+                    <input type="tel" id="telefono_contacto_principal" name="telefono_contacto_principal" required>
+                </div>
+                <div class="form-group">
+                    <label for="relacion_contacto">Relación del contacto principal con el grupo:</label>
+                    <input type="text" id="relacion_contacto" name="relacion_contacto" required>
+                </div>
+                <div class="form-group">
+                    <label for="contacto_suplente">Nombre completo del contacto suplente:</label>
+                    <input type="text" id="contacto_suplente" name="contacto_suplente">
+                </div>
+                <div class="form-group">
+                    <label for="telefono_contacto_suplente">Número de teléfono del contacto suplente:</label>
+                    <input type="tel" id="telefono_contacto_suplente" name="telefono_contacto_suplente">
+                </div>
+                <div class="form-group">
+                    <label for="nivel_educativo">Nivel educativo del grupo:</label>
+                    <select id="nivel_educativo" name="nivel_educativo" required>
+                        <option value="Inicial">Nivel Inicial</option>
+                        <option value="Primario">Nivel Primario</option>
+                        <option value="Secundario">Nivel Secundario</option>
+                        <option value="Adultos Mayores">Adultos Mayores</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="cantidad_alumnos">Cantidad total de alumnos:</label>
+                    <input type="number" id="cantidad_alumnos" name="cantidad_alumnos" required>
+                </div>
+                <div class="form-group">
+                    <label for="edad_alumnos">Edad o rango etario de los alumnos:</label>
+                    <input type="text" id="edad_alumnos" name="edad_alumnos" required>
+                </div>
+                <div class="form-group">
+                    <label>¿Hay alumnos/as con discapacidad?</label>
+                    <div>
+                        <input type="radio" id="discapacidad_si" name="discapacidad" value="Sí" required>
+                        <label for="discapacidad_si">Sí</label>
+                        <input type="radio" id="discapacidad_no" name="discapacidad" value="No" required>
+                        <label for="discapacidad_no">No</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="tipo_discapacidad">Tipo de discapacidad (si aplica):</label>
+                    <input type="text" id="tipo_discapacidad" name="tipo_discapacidad">
+                </div>
+                <div class="form-group">
+                    <label>¿Requiere adaptación?</label>
+                    <div>
+                        <input type="radio" id="adaptacion_si" name="adaptacion" value="Sí">
+                        <label for="adaptacion_si">Sí</label>
+                        <input type="radio" id="adaptacion_no" name="adaptacion" value="No">
+                        <label for="adaptacion_no">No</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- C. SELECCIÓN DE LUGARES A VISITAR -->
+            <div class="section">
+                <h2>C. Selección de Lugares a Visitar</h2>
+                <p>Seleccione los lugares que desea incluir en la visita:</p>
+                <div class="lugares-container">
+                    <div class="lugar-item">
+                        <input type="checkbox" id="museo" name="lugares[]" value="Museo de la Colonización">
+                        <label for="museo">Museo de la Colonización</label>
+                    </div>
+                    <div class="lugar-item">
+                        <input type="checkbox" id="liceo" name="lugares[]" value="Liceo Municipal">
+                        <label for="liceo">Liceo Municipal</label>
+                    </div>
+                    <div class="lugar-item">
+                        <input type="checkbox" id="sala_arte" name="lugares[]" value="Sala de Arte">
+                        <label for="sala_arte">Sala de Arte</label>
+                    </div>
+                    <div class="lugar-item">
+                        <input type="checkbox" id="plaza" name="lugares[]" value="Plaza San Martín">
+                        <label for="plaza">Plaza San Martín</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- D. FECHA Y HORARIO PROPUESTO -->
+            <div class="section">
+                <h2>D. Fecha y Horario Propuesto</h2>
+                <p>Indique la fecha y el horario sugerido para la visita:</p>
+                <div class="form-group">
+                    <label for="fecha_visita">Fecha sugerida de la visita:</label>
+                    <input type="date" id="fecha_visita" name="fecha_visita" required>
+                </div>
+                <div class="form-group">
+                    <label for="hora_grupo1">Hora propuesta para el grupo 1:</label>
+                    <input type="time" id="hora_grupo1" name="hora_grupo1">
+                </div>
+                <div class="form-group">
+                    <label for="hora_grupo2">Hora propuesta para el grupo 2:</label>
+                    <input type="time" id="hora_grupo2" name="hora_grupo2">
+                </div>
+                <div class="form-group">
+                    <label for="observaciones">Observaciones adicionales:</label>
+                    <textarea id="observaciones" name="observaciones" placeholder="Escriba aquí cualquier detalle adicional..."></textarea>
+                </div>
+            </div>
+
+            <!-- Botón Final -->
+            <div class="botones">
+                <button type="submit" class="boton-enviar">Enviar Solicitud</button>
+                <a href="{{ url_for('index') }}" class="boton-volver">Volver al Menú</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

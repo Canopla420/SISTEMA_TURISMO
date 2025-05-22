@@ -1,0 +1,106 @@
+/* General */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #F1EFEC;
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+/* Encabezado */
+.header {
+    background-color: #0f2c4c;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0;
+}
+
+/* Contenedor principal */
+.contenedor {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #d4c9beb4;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Contenedor de datos */
+.datos-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Grupos de formulario */
+.form-group label {
+    font-weight: bold;
+    margin-bottom: 6px;
+    display: block;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #a8a8a8;
+    border-radius: 6px;
+    font-size: 16px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: #005f73;
+    outline: none;
+}
+
+
+/* Botón "Enviar consulta" */
+.boton-enviar {
+    background-color: #356386;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.boton-enviar:hover {
+    background-color: #005f73;
+    transform: scale(1.05);
+}
+
+.boton-enviar:active {
+    background-color: #003f54;
+    transform: scale(0.95);
+}
+
+/* Botón "Volver al menú" */
+.boton-volver {
+    background-color: #64788a;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.boton-volver:hover {
+    background-color: #5a6268;
+    transform: scale(1.05);
+}
+
+.boton-volver:active {
+    background-color: #003f54;
+    transform: scale(0.95);
+}
+

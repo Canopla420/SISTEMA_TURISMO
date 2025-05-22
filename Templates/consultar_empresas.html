@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Consultar Empresas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/consultar_empresa.css') }}">
+</head>
+
+<body>
+    <div class="header">
+        <h1>Consultar Empresas</h1>
+    </div>
+
+    <div class="contenedor">
+        <form action="/enviar_consulta" method="POST">
+            <!-- Contenedor de datos -->
+            <div class="datos-container">
+                <!-- Buscar empresa -->
+                <div class="form-group">
+                    <label for="empresa">Empresa:</label>
+                    <input type="text" id="empresa" name="empresa" list="lista_empresas" placeholder="Buscar empresa..." autocomplete="off">
+                    <datalist id="lista_empresas">
+                        <!-- Se completa con JS -->
+                    </datalist>
+                </div>
+
+                <!-- Correo autocompletado -->
+                <div class="form-group">
+                    <label for="correo">Correo:</label>
+                    <input type="email" id="correo" name="correo" readonly>
+                </div>
+
+                <!-- Otros datos -->
+                <div class="form-group">
+                    <label for="fecha">Fecha de visita:</label>
+                    <input type="date" id="fecha" name="fecha">
+                </div>
+
+                <div class="form-group">
+                    <label for="hora">Hora de visita:</label>
+                    <input type="time" id="hora" name="hora">
+                </div>
+
+                <div class="form-group">
+                    <label for="comentarios">Comentarios:</label>
+                    <textarea id="comentarios" name="comentarios" placeholder="Escribe un mensaje..."></textarea>
+                </div>
+            </div>
+
+            <!-- Botones -->
+            <div class="botones">
+                <!-- Botón "Enviar consulta" -->
+                <button type="submit" class="boton-enviar">Enviar consulta</button>
+
+                <!-- Botón "Volver al menú" -->
+                <button type="button" class="boton-volver" onclick="window.location.href='/'">Volver al menú</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/validaciones.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/consultar_empresa.js') }}"></script>
+</body>
+</html>

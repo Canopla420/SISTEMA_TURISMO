@@ -1,0 +1,116 @@
+/* General */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #F1EFEC;
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+/* Encabezado */
+.header {
+    background-color: #0f2c4c;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+/* Contenedor principal */
+.container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #d4c9beb4;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Formularios */
+.form-group {
+    margin-bottom: 15px;
+    position: relative;
+}
+
+.form-group label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block;
+}
+
+/* Campo de entrada */
+input#visita_input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+input#visita_input::placeholder {
+    color: #aaa;
+    font-style: italic;
+}
+
+/* Lista desplegable */
+#lista_visitas {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background-color: #fff;
+    position: absolute;
+    z-index: 1000;
+    width: 100%;
+    display: none; /* Oculto por defecto */
+}
+
+#lista_visitas li {
+    padding: 10px;
+    cursor: pointer;
+}
+
+#lista_visitas li:hover {
+    background-color: #f0f0f0;
+}
+
+/* Botones */
+.botones {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.boton-confirmar {
+    background-color: #467599;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.boton-confirmar:hover {
+    background-color: #005f73;
+}
+
+.boton-volver {
+    text-decoration: none;
+    background-color: #6c757d;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.boton-volver:hover {
+    background-color: #5a6268;
+}

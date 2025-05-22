@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmar Visitas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/confirmar_visitas.css') }}">
+</head>
+<body>
+    <div class="header">
+        <h1>Confirmar Visitas</h1>
+    </div>
+
+    <div class="container">
+        <form action="/confirmar_visitas" method="POST">
+            <div class="form-group">
+                <label for="visita_input">Buscar visita por institución:</label>
+                <input type="text" id="visita_input" placeholder="Escriba el nombre de la institución" oninput="filtrarVisitas()">
+                <ul id="lista_visitas">
+                    {% for visita in visitas %}
+                    <li onclick="seleccionarVisita('{{ visita.id }}', '{{ visita.nombre_institucion }}')">
+                        {{ visita.nombre_institucion }} - {{ visita.fecha_visita }}
+                    </li>
+                    {% endfor %}
+                </ul>
+                <input type="hidden" id="visita_id" name="visita_id">
+            </div>
+
+            <div class="botones">
+                <button type="submit" class="boton-confirmar">Confirmar</button>
+                <a href="{{ url_for('index') }}" class="boton-volver">Volver al Menú</a>
+            </div>
+        </form>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/confirmar_visitas.js') }}"></script>
+</body>
+</html>

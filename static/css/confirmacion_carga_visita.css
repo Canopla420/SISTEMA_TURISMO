@@ -1,0 +1,47 @@
+body {
+    font-family: 'Arial', sans-serif; /* Tipografía uniforme */
+    background-color: #f4f4f9; /* Fondo suave */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Altura completa de la ventana */
+}
+
+.container {
+    text-align: center;
+    background: white; /* Fondo blanco para el contenedor */
+    padding: 40px; /* Espaciado interno */
+    border-radius: 10px; /* Bordes redondeados */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra para destacar */
+    max-width: 500px; /* Ancho máximo */
+    width: 90%; /* Ancho adaptable */
+}
+
+h1 {
+    color: #467599;; /* Verde para el título */
+    font-size: 34px; /* Tamaño del título */
+    margin-bottom: 20px; /* Espaciado inferior */
+}
+
+p {
+    color: #333; /* Texto más oscuro */
+    font-size: 18px; /* Tamaño del texto */
+    margin-bottom: 30px; /* Espaciado inferior */
+}
+
+a {
+    display: inline-block;
+    text-decoration: none; /* Sin subrayado */
+    background-color: #467599; /* Fondo verde */
+    color: white; /* Texto blanco */
+    padding: 10px 20px; /* Espaciado interno */
+    border-radius: 5px; /* Bordes redondeados */
+    font-size: 16px; /* Tamaño del texto */
+    transition: background-color 0.3s ease; /* Transición suave */
+}
+
+a:hover {
+    background-color: #3d6888; /* Verde más oscuro al pasar el mouse */
+}

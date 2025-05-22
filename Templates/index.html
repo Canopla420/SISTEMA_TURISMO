@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Turismo - Inicio</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+</head>
+<body>
+    <div class="header">
+        <h1>Sistema de Visitas Turísticas</h1>
+    </div>
+
+    <div class="container">
+        <a href="{{ url_for('nueva_visita') }}" class="boton">Cargar nueva visita</a>
+        <a href="{{ url_for('consultar_empresas') }}" class="boton">Consultar empresas</a>
+        <a href="{{ url_for('consultar_visitas') }}" class="boton">Consultar / Modificar / Eliminar visitas</a>
+        <a href="{{ url_for('crear_itinerario') }}" class="boton">Crear itinerario</a>
+    </div>
+</body>
+</html>
