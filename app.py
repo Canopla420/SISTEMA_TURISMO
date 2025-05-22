@@ -6,6 +6,8 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.units import inch
 import io
 import os
+from reportlab.lib.pagesizes import letter
+
 
 app = Flask(__name__)
 
@@ -109,9 +111,9 @@ def solicitar_visita_institucion():
     return render_template('nueva_visita.html')
 
 @app.route('/modificar_visita/<int:id>', methods=['GET', 'POST'])
-def modificar_visita(id):
+def modificar_visita(visita_id):
     """Modificar una visita existente"""
-    visita = SolicitudVisita.query.get_or_404(id)  # Buscar la visita por ID
+    visita = SolicitudVisita.query.get_or_404(visita_id)  # Buscar la visita por ID
 
     if request.method == 'POST':
         # Actualizar todos los datos de la visita con los valores enviados desde el formulario
@@ -151,10 +153,10 @@ def confirmacion_visita():
     return render_template('confirmacion_carga_visita.html')
 
 @app.route('/eliminar_visita/<int:id>', methods=['POST'])
-def eliminar_visita(id):
+def eliminar_visita(visita_id):
     """Eliminar una visita por su ID"""
     # Buscar la visita por ID
-    visita = SolicitudVisita.query.get_or_404(id)
+    visita = SolicitudVisita.query.get_or_404(visita_id)
     
     # Eliminar la visita
     db.session.delete(visita)
@@ -169,18 +171,18 @@ def nueva_visita():
     return render_template('nueva_visita.html')
 
 @app.route('/confirmar_visita/<int:id>', methods=['POST'])
-def confirmar_visita(id):
+def confirmar_visita(visita_id):
     """Confirmar una visita por su ID"""
-    visita = SolicitudVisita.query.get_or_404(id)
+    visita = SolicitudVisita.query.get_or_404(visita_id)
     if visita.estado == "Pendiente":
         visita.estado = "Confirmada"
         db.session.commit()
     return redirect(url_for('consultar_visitas'))
 
 @app.route('/rechazar_visita/<int:id>', methods=['POST'])
-def rechazar_visita(id):
+def rechazar_visita(visita_id):
     """Rechazar una visita por su ID"""
-    visita = SolicitudVisita.query.get_or_404(id)
+    visita = SolicitudVisita.query.get_or_404(visita_id)
     if visita.estado == "Confirmada":
         visita.estado = "Pendiente"
         db.session.commit()
