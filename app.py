@@ -193,10 +193,6 @@ def consultar_visitas():
     visitas = SolicitudVisita.query.all()
     return render_template('consultar_visitas.html', visitas=visitas)
 
-@app.route('/crear_itinerario')
-def crear_itinerario():
-    """Pantalla para crear un itinerario"""
-    return render_template('crear_itinerario.html')
 
 # ------------------------------
 # Rutas relacionadas con empresas
