@@ -111,9 +111,9 @@ def solicitar_visita_institucion():
     return render_template('nueva_visita.html')
 
 @app.route('/modificar_visita/<int:id>', methods=['GET', 'POST'])
-def modificar_visita(visita_id):
+def modificar_visita(id):
     """Modificar una visita existente"""
-    visita = SolicitudVisita.query.get_or_404(visita_id)  # Buscar la visita por ID
+    visita = SolicitudVisita.query.get_or_404(id)  # Buscar la visita por ID
 
     if request.method == 'POST':
         # Actualizar todos los datos de la visita con los valores enviados desde el formulario
@@ -156,7 +156,7 @@ def confirmacion_visita():
 def eliminar_visita(visita_id):
     """Eliminar una visita por su ID"""
     # Buscar la visita por ID
-    visita = SolicitudVisita.query.get_or_404(visita_id)
+    visita = SolicitudVisita.query.get_or_404(id)
     
     # Eliminar la visita
     db.session.delete(visita)
@@ -171,18 +171,18 @@ def nueva_visita():
     return render_template('nueva_visita.html')
 
 @app.route('/confirmar_visita/<int:id>', methods=['POST'])
-def confirmar_visita(visita_id):
+def confirmar_visita(id):
     """Confirmar una visita por su ID"""
-    visita = SolicitudVisita.query.get_or_404(visita_id)
+    visita = SolicitudVisita.query.get_or_404(id)
     if visita.estado == "Pendiente":
         visita.estado = "Confirmada"
         db.session.commit()
     return redirect(url_for('consultar_visitas'))
 
 @app.route('/rechazar_visita/<int:id>', methods=['POST'])
-def rechazar_visita(visita_id):
+def rechazar_visita(id):
     """Rechazar una visita por su ID"""
-    visita = SolicitudVisita.query.get_or_404(visita_id)
+    visita = SolicitudVisita.query.get_or_404(id)
     if visita.estado == "Confirmada":
         visita.estado = "Pendiente"
         db.session.commit()
@@ -285,49 +285,71 @@ def crear_itinerario():
         p = canvas.Canvas(buffer, pagesize=letter)
         width, height = letter
 
-        # Márgenes tipo APA
+        # Márgenes
         left_margin = right_margin = top_margin = bottom_margin = inch
 
-        # # Logo
+        # Logo (descomenta si tienes logo)
         # logo_path = os.path.join('static', 'img', 'logo.png')
         # if os.path.exists(logo_path):
-        #     p.drawImage(logo_path, left_margin, height - top_margin - 60, width=100, height=60, mask='auto')
+        #     p.drawImage(logo_path, width - right_margin - 100, height - top_margin - 60, width=90, height=50, mask='auto')
 
-        # Título
-        p.setFont("Times-Bold", 16)
-        p.drawCentredString(width / 2, height - top_margin - 80, "Itinerario de Visita")
+        # Título principal
+        p.setFont("Helvetica-Bold", 20)
+        p.setFillColorRGB(0.1, 0.2, 0.4)
+        p.drawCentredString(width / 2, height - top_margin - 30, "Itinerario de Visita")
 
-        # Datos de la visita (formato APA)
-        p.setFont("Times-Roman", 12)
-        y = height - top_margin - 120
-        line_space = 24
+        # Línea separadora
+        p.setStrokeColorRGB(0.1, 0.2, 0.4)
+        p.setLineWidth(2)
+        p.line(left_margin, height - top_margin - 40, width - right_margin, height - top_margin - 40)
 
-        p.drawString(left_margin, y, f"Institución: {visita.nombre_institucion}")
-        y -= line_space
-        p.drawString(left_margin, y, f"Fecha de visita: {visita.fecha_visita}")
-        y -= line_space
-        p.drawString(left_margin, y, f"Localidad: {visita.localidad}")
-        y -= line_space
-        p.drawString(left_margin, y, f"Director/a: {visita.director}")
-        y -= line_space
-        p.drawString(left_margin, y, f"Correo: {visita.correo_institucional}")
-        y -= line_space
-        p.drawString(left_margin, y, f"Teléfono: {visita.telefono_institucion}")
-        y -= line_space
-        p.drawString(left_margin, y, f"Nivel educativo: {visita.nivel_educativo}")
-        y -= line_space
-        p.drawString(left_margin, y, f"Cantidad de alumnos: {visita.cantidad_alumnos}")
-        y -= line_space
-        p.drawString(left_margin, y, f"Lugares a visitar: {visita.lugares}")
-        y -= line_space
-        p.drawString(left_margin, y, f"Observaciones: {visita.observaciones or 'Ninguna'}")
+        # Subtítulo
+        p.setFont("Helvetica-Bold", 14)
+        p.setFillColorRGB(0.2, 0.2, 0.2)
+        p.drawString(left_margin, height - top_margin - 70, "Datos de la Institución:")
+
+        # Datos de la visita
+        p.setFont("Helvetica", 12)
+        p.setFillColorRGB(0, 0, 0)
+        y = height - top_margin - 100
+        line_space = 20
+
+        datos = [
+            ("Institución", visita.nombre_institucion),
+            ("Fecha de visita", visita.fecha_visita),
+            ("Localidad", visita.localidad),
+            ("Director/a", visita.director),
+            ("Correo", visita.correo_institucional),
+            ("Teléfono", visita.telefono_institucion),
+            ("Nivel educativo", visita.nivel_educativo),
+            ("Cantidad de alumnos", visita.cantidad_alumnos),
+            ("Lugares a visitar", visita.lugares),
+            ("Observaciones", visita.observaciones or "Ninguna"),
+        ]
+
+        for label, value in datos:
+            p.setFont("Helvetica-Bold", 12)
+            p.drawString(left_margin, y, f"{label}:")
+            p.setFont("Helvetica", 12)
+            p.drawString(left_margin + 130, y, str(value))
+            y -= line_space
+
+        # Línea separadora final
+        p.setStrokeColorRGB(0.7, 0.7, 0.7)
+        p.setLineWidth(1)
+        p.line(left_margin, y + 10, width - right_margin, y + 10)
+
+        # Pie de página
+        p.setFont("Helvetica-Oblique", 10)
+        p.setFillColorRGB(0.3, 0.3, 0.3)
+        p.drawCentredString(width / 2, bottom_margin, "Sistema de Gestión de Visitas - ITEC")
 
         p.save()
         buffer.seek(0)
         return send_file(buffer, as_attachment=True, download_name="itinerario.pdf", mimetype='application/pdf')
 
-    # GET: mostrar selector de visitas
-    visitas = SolicitudVisita.query.all()
+    # GET: mostrar solo visitas confirmadas
+    visitas = SolicitudVisita.query.filter_by(estado="Confirmada").all()
     return render_template('crear_itinerario.html', visitas=visitas)
 
 

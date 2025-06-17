@@ -1,130 +1,128 @@
 /* General */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f5f5f5;
-    margin: 0;
-    padding: 0;
-    color: #333;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f1efec;
+  margin: 0;
+  padding: 0;
+  color: #333;
 }
 
 /* Encabezado */
 .header {
-    background-color: #005f73;
-    color: white;
-    text-align: center;
-    padding: 20px;
-    font-size: 24px;
-    font-weight: bold;
+  background-color: #0f2c4c;
+  color: white;
+  text-align: center;
+  padding: 20px;
+  font-size: 24px;
+  font-weight: bold;
 }
 
 /* Contenedor principal */
 .container {
-    max-width: 800px;
-    margin: 40px auto;
-    padding: 20px;
-    background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 50px;
+  background-color: #d4c9beb4;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 /* Tabla */
 table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
-table th, table td {
-    border: 1px solid #ccc;
-    padding: 10px;
-    text-align: left;
+table th,
+table td {
+  border: 1px solid #bdbdbd;
+  padding: 12px;
+  text-align: left;
 }
 
 table th {
-    background-color: #005f73;
-    color: white;
+  background-color: #0f2c4c;
+  color: white;
 }
 
 table tr:nth-child(even) {
-    background-color: #f9f9f9;
+  background-color: #f7f3ee;
 }
 
 table tr:hover {
-    background-color: #f1f1f1;
+  background-color: #e6e0d8;
 }
 
 /* Botones */
-.boton-confirmar, .boton-modificar, .boton-eliminar, .boton-volver {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 6px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+.boton-confirmar,
+.boton-modificar,
+.boton-eliminar,
+.boton-volver,
+.boton-rechazar {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+  font-family: inherit;
 }
 
 /* Botón Confirmar */
 .boton-confirmar {
-   background-color: #467599; /* Azul */
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 6px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+  background-color: #356386;
+  color: white;
 }
 
 .boton-confirmar:hover {
-    background-color: #005f73;
-    transform: scale(1.05);
+  background-color: #005f73;
+  transform: scale(1.05);
 }
 
 /* Botón Modificar */
 .boton-modificar {
-    background-color: #f0ad4e; /* Naranja */
-    color: white;
+  background-color: #f0ad4e;
+  color: white;
 }
 
 .boton-modificar:hover {
-    background-color: #ec971f; /* Naranja más oscuro */
-    transform: scale(1.05);
+  background-color: #ec971f;
+  transform: scale(1.05);
 }
 
 /* Botón Eliminar */
 .boton-eliminar {
-    background-color: #d9534f; /* Rojo */
-    color: white;
+  background-color: #d9534f;
+  color: white;
 }
 
 .boton-eliminar:hover {
-    background-color: #c9302c; /* Rojo más oscuro */
-    transform: scale(1.05);
+  background-color: #c9302c;
+  transform: scale(1.05);
 }
 
 /* Botón Volver al Menú */
 .boton-volver {
-    background-color: #6c757d; /* Gris */
-    color: white;
+  background-color: #64788a;
+  color: white;
 }
 
 .boton-volver:hover {
-    background-color: #5a6268; /* Gris más oscuro */
-    transform: scale(1.05);
+  background-color: #5a6268;
+  transform: scale(1.05);
 }
 
+/* Botón Rechazar */
 .boton-rechazar {
-    background-color: #ff7300; /* Rojo */
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 6px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+  background-color: #ff7300;
+  color: white;
 }
 
 .boton-rechazar:hover {
-    background-color: #ff6200; /* Rojo más oscuro */
-    transform: scale(1.05);
+  background-color: #ff6200;
+  transform: scale(1.05);
 }

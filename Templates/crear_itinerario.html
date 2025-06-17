@@ -1,30 +1,35 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Crear Itinerario</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/nueva_visita.css') }}">
-</head>
-<body>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/crear_itinerario.css') }}"
+    />
+  </head>
+  <body>
     <div class="header">
-        <h1>Crear Itinerario</h1>
+      <h1>Crear Itinerario</h1>
     </div>
     <div class="container">
-        <form method="POST" action="{{ url_for('crear_itinerario') }}">
-            <label for="visita_id">Selecciona una visita:</label>
-            <select id="visita_id" name="visita_id" required>
-                {% for visita in visitas %}
-                    <option value="{{ visita.id }}">
-                        {{ visita.nombre_institucion }} - {{ visita.fecha_visita }}
-                    </option>
-                {% endfor %}
-            </select>
-            <br><br>
-            <button type="submit">Generar PDF</button>
-        </form>
-        <br>
+      <form method="POST" action="{{ url_for('crear_itinerario') }}">
+        <div class="form-group">
+          <label for="visita_id">Selecciona una visita:</label>
+          <select id="visita_id" name="visita_id" required>
+            {% for visita in visitas %}
+            <option value="{{ visita.id }}">
+              {{ visita.nombre_institucion }} - {{ visita.fecha_visita }}
+            </option>
+            {% endfor %}
+          </select>
+          <button type="submit" class="btn-pdf">Generar PDF</button>
+        </div>
+      </form>
+      <div class="volver-menu">
         <a href="{{ url_for('index') }}">Volver al Menú</a>
+      </div>
     </div>
-</body>
+  </body>
 </html>
