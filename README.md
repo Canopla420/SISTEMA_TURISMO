@@ -208,8 +208,22 @@ psql -U postgres sistema_turismo < backup.sql
    - Try-catch en operaciones críticas
    - Rollback automático en caso de errores
    - Logging de errores para debugging
-
+   
 4. **Configuración flexible**: 
    - Variables de entorno para credenciales
    - Configuraciones separadas para desarrollo/producción
    - Fácil cambio entre entornos
+  
+
+     # 1. Clonar el repositorio
+git clone https://github.com/Canopla420/SISTEMA_TURISMO.git
+cd SISTEMA_TURISMO
+
+# 2. Instalar dependencias
+pip install -r requirements.txt
+
+# 3. Configurar base de datos
+flask db upgrade
+
+# 4. Ejecutar
+python app.py
