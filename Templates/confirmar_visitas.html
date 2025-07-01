@@ -3,36 +3,278 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Confirmar Visitas</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/confirmar_visitas.css') }}">
+    <title>Confirmar Visitas Turísticas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/nueva_visita.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/empresas.css') }}">
 </head>
 <body>
     <div class="header">
-        <h1>Confirmar Visitas</h1>
+        <h1>✅ Confirmar Visitas Turísticas</h1>
+        <p>Busque y confirme las visitas pendientes de aprobación</p>
     </div>
 
     <div class="container">
-        <form action="/confirmar_visitas" method="POST">
-            <div class="form-group">
-                <label for="visita_input">Buscar visita por institución:</label>
-                <input type="text" id="visita_input" placeholder="Escriba el nombre de la institución" oninput="filtrarVisitas()">
-                <ul id="lista_visitas">
-                    {% for visita in visitas %}
-                    <li onclick="seleccionarVisita('{{ visita.id }}', '{{ visita.nombre_institucion }}')">
-                        {{ visita.nombre_institucion }} - {{ visita.fecha_visita }}
-                    </li>
-                    {% endfor %}
-                </ul>
-                <input type="hidden" id="visita_id" name="visita_id">
+        <!-- Información del proceso -->
+        <div class="section">
+            <div class="info-panel">
+                <div class="info-item">
+                    <strong>🔍 Búsqueda:</strong> 
+                    Utilice el campo de búsqueda para encontrar visitas pendientes por nombre de institución.
+                </div>
+                <div class="info-item">
+                    <strong>✅ Confirmación:</strong> 
+                    Al confirmar una visita, esta quedará programada y lista para generar itinerario.
+                </div>
             </div>
+        </div>
 
-            <div class="botones">
-                <button type="submit" class="boton-confirmar">Confirmar</button>
-                <a href="{{ url_for('index') }}" class="boton-volver">Volver al Menú</a>
+        <!-- Formulario de confirmación -->
+        <div class="section">
+            <h2>🔍 Buscar Visita Pendiente</h2>
+            <form action="/confirmar_visitas" method="POST" class="form-solicitud">
+                <div class="form-group">
+                    <label for="visita_input">🏫 Buscar visita por institución:</label>
+                    <input type="text" id="visita_input" 
+                           placeholder="Escriba el nombre de la institución..." 
+                           oninput="filtrarVisitas()">
+                    
+                    <div class="lista-container">
+                        <ul id="lista_visitas" class="lista-visitas">
+                            {% for visita in visitas %}
+                            <li class="visita-item" 
+                                onclick="seleccionarVisita('{{ visita.id }}', '{{ visita.nombre_institucion }}')">
+                                <div class="visita-info">
+                                    <strong>🏫 {{ visita.nombre_institucion }}</strong>
+                                    <small>📅 {{ visita.fecha_visita }}</small>
+                                    <span class="estado-badge pendiente">⏳ Pendiente</span>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    
+                    <input type="hidden" id="visita_id" name="visita_id">
+                </div>
+
+                <!-- Botones -->
+                <div class="botones">
+                    <button type="submit" class="boton-enviar">
+                        ✅ Confirmar Visita
+                    </button>
+                    <a href="{{ url_for('index') }}" class="boton-volver">
+                        🏠 Volver al Menú
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Información adicional -->
+        <div class="section">
+            <h2>ℹ️ Información sobre Confirmaciones</h2>
+            <div class="info-panel">
+                <div class="info-item">
+                    <strong>📋 Proceso:</strong> 
+                    Una vez confirmada, la visita cambiará de estado "Pendiente" a "Confirmada" y podrá procederse con la planificación.
+                </div>
+                <div class="info-item">
+                    <strong>📄 Siguiente paso:</strong> 
+                    Después de confirmar, puede generar el itinerario desde el menú "Crear itinerario".
+                </div>
+                <div class="info-item">
+                    <strong>🔄 Modificaciones:</strong> 
+                    Las visitas confirmadas aún pueden modificarse desde "Consultar visitas" si es necesario.
+                </div>
             </div>
-        </form>
+        </div>
+
+        <!-- Estadísticas -->
+        {% if visitas|length > 0 %}
+        <div class="section">
+            <h2>📊 Visitas Pendientes</h2>
+            <div class="estadisticas-grid">
+                <div class="stat-card identidad">
+                    <div class="stat-number">{{ visitas|length }}</div>
+                    <div class="stat-label">Esperando Confirmación</div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
 
+    <!-- Estilos específicos para confirmar visitas -->
+    <style>
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 1.1em;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #005f73;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background-color: #ffffff;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #005f73;
+            box-shadow: 0 0 0 3px rgba(0, 95, 115, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .lista-container {
+            margin-top: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            background-color: #ffffff;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .lista-visitas {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .visita-item {
+            padding: 15px;
+            border-bottom: 1px solid #f1f3f4;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .visita-item:hover {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            transform: translateX(5px);
+        }
+
+        .visita-item:last-child {
+            border-bottom: none;
+        }
+
+        .visita-item.selected {
+            background: linear-gradient(135deg, #e8f5e8, #d4edda);
+            border-left: 4px solid #28a745;
+        }
+
+        .visita-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .visita-info strong {
+            color: #005f73;
+            font-size: 1.1em;
+        }
+
+        .visita-info small {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .estado-badge.pendiente {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            align-self: flex-start;
+            margin-top: 5px;
+        }
+
+        .botones {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .boton-enviar, .boton-volver {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .boton-enviar {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border: 2px solid #28a745;
+        }
+
+        .boton-enviar:hover {
+            background: linear-gradient(135deg, #218838, #1abc9c);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        .boton-volver {
+            background: linear-gradient(135deg, #6c757d, #495057);
+            color: white;
+            border: 2px solid #6c757d;
+        }
+
+        .boton-volver:hover {
+            background: linear-gradient(135deg, #5a6268, #343a40);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(108, 117, 125, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .botones {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .boton-enviar, .boton-volver {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .visita-info {
+                flex-direction: column;
+            }
+        }
+    </style>
+
+    <!-- Scripts JavaScript -->
     <script src="{{ url_for('static', filename='js/confirmar_visitas.js') }}"></script>
+    <script>
+        // Función mejorada para seleccionar visita
+        function seleccionarVisita(id, nombre) {
+            document.getElementById('visita_id').value = id;
+            document.getElementById('visita_input').value = nombre;
+            
+            // Marcar como seleccionado visualmente
+            const items = document.querySelectorAll('.visita-item');
+            items.forEach(item => item.classList.remove('selected'));
+            event.target.closest('.visita-item').classList.add('selected');
+        }
+    </script>
 </body>
 </html>

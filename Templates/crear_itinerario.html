@@ -1,35 +1,82 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Crear Itinerario</title>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/crear_itinerario.css') }}"
-    />
-  </head>
-  <body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Itinerario - Sistema de Gestión de Visitas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/crear_itinerario.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Encabezado -->
     <div class="header">
-      <h1>Crear Itinerario</h1>
+        <i class="fas fa-route"></i>
+        Sistema de Gestión de Visitas - Crear Itinerario
     </div>
+
+    <!-- Contenedor principal -->
     <div class="container">
-      <form method="POST" action="{{ url_for('crear_itinerario') }}">
-        <div class="form-group">
-          <label for="visita_id">Selecciona una visita:</label>
-          <select id="visita_id" name="visita_id" required>
-            {% for visita in visitas %}
-            <option value="{{ visita.id }}">
-              {{ visita.nombre_institucion }} - {{ visita.fecha_visita }}
-            </option>
-            {% endfor %}
-          </select>
-          <button type="submit" class="btn-pdf">Generar PDF</button>
+        <!-- Card principal -->
+        <div class="main-card">
+            <div class="card-header">
+                <h1><i class="fas fa-file-pdf"></i> Crear Itinerario</h1>
+                <p>Seleccione una visita confirmada para generar su itinerario en PDF</p>
+            </div>
+
+            <div class="card-body">
+                {% if visitas %}
+                    <form method="POST" action="{{ url_for('crear_itinerario') }}" class="form-itinerario">
+                        <div class="form-group">
+                            <label for="visita_id">
+                                <i class="fas fa-calendar-check"></i>
+                                Seleccionar Visita:
+                            </label>
+                            <select id="visita_id" name="visita_id" required class="form-select">
+                                <option value="">-- Seleccione una visita --</option>
+                                {% for visita in visitas %}
+                                <option value="{{ visita.id }}">
+                                    <strong>{{ visita.nombre_institucion }}</strong> - {{ visita.fecha_visita.strftime('%d/%m/%Y') }}
+                                    {% if visita.hora_grupo1 %}
+                                        (Grupo 1: {{ visita.hora_grupo1.strftime('%H:%M') }}{% if visita.hora_grupo2 %}, Grupo 2: {{ visita.hora_grupo2.strftime('%H:%M') }}{% endif %})
+                                    {% endif %}
+                                    - {{ visita.cantidad_alumnos }} alumnos
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-file-pdf"></i>
+                                Generar Itinerario PDF
+                            </button>
+                        </div>
+                    </form>
+                {% else %}
+                    <div class="no-visitas">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <h3>No hay visitas disponibles</h3>
+                        <p>No se encontraron visitas confirmadas para generar itinerarios.</p>
+                        <a href="{{ url_for('nueva_visita') }}" class="btn btn-outline">
+                            <i class="fas fa-plus"></i>
+                            Crear Nueva Visita
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
         </div>
-      </form>
-      <div class="volver-menu">
-        <a href="{{ url_for('index') }}">Volver al Menú</a>
-      </div>
+
+        <!-- Botones de navegación -->
+        <div class="navigation-buttons">
+            <a href="{{ url_for('index') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i>
+                Volver al Menú Principal
+            </a>
+            <a href="{{ url_for('consultar_visitas') }}" class="btn btn-outline">
+                <i class="fas fa-eye"></i>
+                Ver Todas las Visitas
+            </a>
+        </div>
     </div>
-  </body>
+</body>
 </html>

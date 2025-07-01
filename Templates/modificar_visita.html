@@ -3,16 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modificar Visita</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/modificar_visita.css') }}">
+    <title>Modificar Visita Turística</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/nueva_visita.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/empresas.css') }}">
 </head>
 <body>
     <div class="header">
-        <h1>Modificar Visita</h1>
+        <h1>✏️ Modificar Visita Turística</h1>
+        <p>Edite la información de la visita programada: <strong>{{ visita.nombre_institucion }}</strong></p>
     </div>
 
     <div class="container">
-        <form action="/modificar_visita/{{ visita.id }}" method="POST" class="form-modificar">
+        <!-- Información del proceso -->
+        <div class="section">
+            <div class="info-panel">
+                <div class="info-item">
+                    <strong>📝 Modificando:</strong> 
+                    Está editando la visita de <strong>{{ visita.nombre_institucion }}</strong>. Los cambios se guardarán al presionar "Actualizar Visita".
+                </div>
+                <div class="info-item">
+                    <strong>📅 Estado actual:</strong> 
+                    Esta visita está en estado <strong>{{ visita.estado }}</strong> y programada para el {{ visita.fecha_visita }}.
+                </div>
+            </div>
+        </div>
+
+        <form action="/modificar_visita/{{ visita.id }}" method="POST" class="form-solicitud">
             <!-- A. DATOS DE LA INSTITUCIÓN -->
             <div class="section">
                 <h2>A. Datos de la Institución</h2>
@@ -105,11 +121,11 @@
                 </div>
                 <div class="form-group">
                     <label for="hora_grupo1">Hora Propuesta para el Grupo 1:</label>
-                    <input type="time" id="hora_grupo1" name="hora_grupo1" value="{{ visita.hora_grupo1 }}">
+                    <input type="time" id="hora_grupo1" name="hora_grupo1" value="{{ visita.hora_grupo1.strftime('%H:%M') if visita.hora_grupo1 else '' }}">
                 </div>
                 <div class="form-group">
                     <label for="hora_grupo2">Hora Propuesta para el Grupo 2:</label>
-                    <input type="time" id="hora_grupo2" name="hora_grupo2" value="{{ visita.hora_grupo2 }}">
+                    <input type="time" id="hora_grupo2" name="hora_grupo2" value="{{ visita.hora_grupo2.strftime('%H:%M') if visita.hora_grupo2 else '' }}">
                 </div>
                 <div class="form-group">
                     <label for="observaciones">Observaciones:</label>
@@ -119,10 +135,189 @@
 
             <!-- Botones -->
             <div class="botones">
-                <button type="submit" class="boton-guardar">Guardar Cambios</button>
-                <a href="{{ url_for('consultar_visitas') }}" class="boton-cancelar">Cancelar</a>
+                <button type="submit" class="boton-enviar">
+                    💾 Actualizar Visita
+                </button>
+                <a href="{{ url_for('consultar_visitas') }}" class="boton-volver">
+                    ↩️ Volver a Consultas
+                </a>
             </div>
         </form>
+
+        <!-- Estado actual de la visita -->
+        <div class="section">
+            <h2>📊 Estado Actual</h2>
+            <div class="estado-empresa">
+                <div class="estado-item">
+                    <span class="estado-badge {{ 'activa' if visita.estado == 'Confirmada' else 'pendiente' if visita.estado == 'Pendiente' else 'inactiva' }}">
+                        {% if visita.estado == 'Confirmada' %}
+                        ✅ Visita Confirmada
+                        {% elif visita.estado == 'Pendiente' %}
+                        ⏳ Visita Pendiente
+                        {% else %}
+                        ❌ Visita Rechazada
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="estado-item">
+                    <span class="nivel-badge">📅 {{ visita.fecha_visita }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información adicional -->
+        <div class="section">
+            <h2>ℹ️ Guía de Modificación</h2>
+            <div class="info-panel">
+                <div class="info-item">
+                    <strong>🔄 Cambios:</strong> 
+                    Cualquier modificación que realice se aplicará inmediatamente al registro de la visita.
+                </div>
+                <div class="info-item">
+                    <strong>📅 Fechas:</strong> 
+                    Si cambia la fecha, asegúrese de coordinar con las empresas y la institución visitante.
+                </div>
+                <div class="info-item">
+                    <strong>📚 Niveles:</strong> 
+                    Recuerde que el sistema maneja únicamente Primario y Secundario según las especificaciones de la Dirección de Turismo.
+                </div>
+            </div>
+        </div>
     </div>
+
+    <!-- Estilos específicos para modificar visita -->
+    <style>
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 1.1em;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .header p strong {
+            color: #ffd60a;
+            font-weight: 600;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #005f73;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background-color: #ffffff;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #005f73;
+            box-shadow: 0 0 0 3px rgba(0, 95, 115, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .form-group input[type="radio"],
+        .form-group input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+            transform: scale(1.2);
+            accent-color: #005f73;
+        }
+
+        .botones {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .boton-enviar, .boton-volver {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .boton-enviar {
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+            color: white;
+            border: 2px solid #ffc107;
+        }
+
+        .boton-enviar:hover {
+            background: linear-gradient(135deg, #e0a800, #ef6f00);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 193, 7, 0.3);
+        }
+
+        .boton-volver {
+            background: linear-gradient(135deg, #6c757d, #495057);
+            color: white;
+            border: 2px solid #6c757d;
+        }
+
+        .boton-volver:hover {
+            background: linear-gradient(135deg, #5a6268, #343a40);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(108, 117, 125, 0.3);
+        }
+
+        .estado-empresa {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .estado-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .estado-badge.pendiente {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .botones {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .boton-enviar, .boton-volver {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .estado-empresa {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
 </body>
 </html>
