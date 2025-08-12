@@ -1,23 +1,38 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Consultar Empresas</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/consultar_empresa.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consultar Empresas Turísticas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/nueva_visita.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/empresas.css') }}">
 </head>
-
 <body>
     <div class="header">
-        <h1>Consultar Empresas</h1>
+        <h1>🔍 Consultar Empresas Turísticas</h1>
+        <p>Explore las empresas disponibles y consulte su información de contacto</p>
     </div>
 
-    <div class="contenedor">
-        <form action="/enviar_consulta" method="POST">
-            <!-- Contenedor de datos -->
-            <div class="datos-container">
+    <div class="container">
+        <!-- Información del proceso -->
+        <div class="section">
+            <div class="info-panel">
+                <div class="info-item">
+                    <strong>🔍 Búsqueda:</strong> 
+                    Utilice el campo de búsqueda para encontrar empresas específicas o explore todas las opciones disponibles.
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulario de consulta -->
+        <div class="section">
+            <h2>📋 Búsqueda de Empresa</h2>
+            <form action="/enviar_consulta" method="POST" class="form-solicitud">
                 <!-- Buscar empresa -->
                 <div class="form-group">
-                    <label for="empresa">Empresa:</label>
-                    <input type="text" id="empresa" name="empresa" list="lista_empresas" placeholder="Buscar empresa..." autocomplete="off">
+                    <label for="empresa">🏢 Empresa:</label>
+                    <input type="text" id="empresa" name="empresa" list="lista_empresas" 
+                           placeholder="Buscar empresa..." autocomplete="off">
                     <datalist id="lista_empresas">
                         <!-- Se completa con JS -->
                     </datalist>
@@ -25,38 +40,164 @@
 
                 <!-- Correo autocompletado -->
                 <div class="form-group">
-                    <label for="correo">Correo:</label>
-                    <input type="email" id="correo" name="correo" readonly>
+                    <label for="correo">📧 Correo:</label>
+                    <input type="email" id="correo" name="correo" readonly 
+                           placeholder="El correo se completará automáticamente">
                 </div>
 
                 <!-- Otros datos -->
                 <div class="form-group">
-                    <label for="fecha">Fecha de visita:</label>
+                    <label for="fecha">📅 Fecha de visita:</label>
                     <input type="date" id="fecha" name="fecha">
                 </div>
 
                 <div class="form-group">
-                    <label for="hora">Hora de visita:</label>
+                    <label for="hora">🕐 Hora de visita:</label>
                     <input type="time" id="hora" name="hora">
                 </div>
 
                 <div class="form-group">
-                    <label for="comentarios">Comentarios:</label>
-                    <textarea id="comentarios" name="comentarios" placeholder="Escribe un mensaje..."></textarea>
+                    <label for="comentarios">💬 Comentarios:</label>
+                    <textarea id="comentarios" name="comentarios" 
+                              placeholder="Escribe un mensaje para la empresa..." rows="4"></textarea>
+                </div>
+
+                <!-- Botones -->
+                <div class="botones">
+                    <button type="submit" class="boton-enviar">
+                        📨 Enviar Consulta
+                    </button>
+                    <a href="{{ url_for('index') }}" class="boton-volver">
+                        🏠 Volver al Menú
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Información adicional -->
+        <div class="section">
+            <h2>ℹ️ Información de Consultas</h2>
+            <div class="info-panel">
+                <div class="info-item">
+                    <strong>📧 Envío automático:</strong> 
+                    Su consulta se enviará directamente al correo electrónico de la empresa seleccionada.
+                </div>
+                <div class="info-item">
+                    <strong>⏰ Tiempo de respuesta:</strong> 
+                    Las empresas suelen responder en un plazo de 24-48 horas hábiles.
+                </div>
+                <div class="info-item">
+                    <strong>📞 Contacto directo:</strong> 
+                    Para consultas urgentes, puede contactar directamente a la empresa usando la información proporcionada.
                 </div>
             </div>
-
-            <!-- Botones -->
-            <div class="botones">
-                <!-- Botón "Enviar consulta" -->
-                <button type="submit" class="boton-enviar">Enviar consulta</button>
-
-                <!-- Botón "Volver al menú" -->
-                <button type="button" class="boton-volver" onclick="window.location.href='/'">Volver al menú</button>
-            </div>
-        </form>
+        </div>
     </div>
 
+    <!-- Estilos específicos para consultar empresas -->
+    <style>
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 1.1em;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #005f73;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background-color: #ffffff;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #005f73;
+            box-shadow: 0 0 0 3px rgba(0, 95, 115, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .form-group input[readonly] {
+            background-color: #f8f9fa;
+            color: #6c757d;
+        }
+
+        .botones {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .boton-enviar, .boton-volver {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .boton-enviar {
+            background: linear-gradient(135deg, #17a2b8, #138496);
+            color: white;
+            border: 2px solid #17a2b8;
+        }
+
+        .boton-enviar:hover {
+            background: linear-gradient(135deg, #138496, #117a8b);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(23, 162, 184, 0.3);
+        }
+
+        .boton-volver {
+            background: linear-gradient(135deg, #6c757d, #495057);
+            color: white;
+            border: 2px solid #6c757d;
+        }
+
+        .boton-volver:hover {
+            background: linear-gradient(135deg, #5a6268, #343a40);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(108, 117, 125, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .botones {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .boton-enviar, .boton-volver {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+
+    <!-- Scripts JavaScript -->
     <script src="{{ url_for('static', filename='js/validaciones.js') }}"></script>
     <script src="{{ url_for('static', filename='js/consultar_empresa.js') }}"></script>
 </body>

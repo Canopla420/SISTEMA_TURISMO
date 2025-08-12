@@ -1,95 +1,276 @@
 /* General */
 body {
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f1efec;
-  margin: 0;
-  padding: 0;
-  color: #333;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f1efec 0%, #e8e4df 100%);
+    margin: 0;
+    padding: 0;
+    color: #333;
+    min-height: 100vh;
 }
 
 /* Encabezado */
 .header {
-  background-color: #0f2c4c;
-  color: white;
-  text-align: center;
-  padding: 20px;
-  font-size: 24px;
-  font-weight: bold;
+    background: linear-gradient(135deg, #0f2c4c 0%, #1a4a73 100%);
+    color: white;
+    text-align: center;
+    padding: 25px 20px;
+    font-size: 24px;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(15, 44, 76, 0.3);
+    position: relative;
+}
+
+.header i {
+    margin-right: 10px;
+    font-size: 26px;
 }
 
 /* Contenedor principal */
 .container {
-  max-width: 400px;
-  margin: 30px auto;
-  padding: 40px 30px;
-  background-color: #d4c9beb4;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 20px;
+}
+
+/* Card principal */
+.main-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-bottom: 30px;
+}
+
+.card-header {
+    background: linear-gradient(135deg, #d4c9be 0%, #c8bdb0 100%);
+    padding: 30px;
+    text-align: center;
+    border-bottom: 1px solid #b8aca0;
+}
+
+.card-header h1 {
+    color: #0f2c4c;
+    margin: 0 0 10px 0;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.card-header h1 i {
+    margin-right: 12px;
+    color: #356386;
+}
+
+.card-header p {
+    color: #5a5a5a;
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.card-body {
+    padding: 40px;
 }
 
 /* Formulario */
+.form-itinerario {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
 .form-group {
-  margin-bottom: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+    margin-bottom: 25px;
 }
 
 .form-group label {
-  font-weight: bold;
-  margin-bottom: 5px;
-  color: #0f2c4c;
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #0f2c4c;
+    font-size: 16px;
 }
 
-.form-group select {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #a8a8a8;
-  border-radius: 6px;
-  font-size: 16px;
-  box-sizing: border-box;
+.form-group label i {
+    margin-right: 8px;
+    color: #356386;
+    width: 20px;
 }
 
-.form-group select:focus {
-  border-color: #005f73;
-  outline: none;
+.form-select {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 16px;
+    background-color: #fafafa;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
 }
 
-.btn-pdf {
-  background-color: #356386;
-  color: white;
-  padding: 10px 24px;
-  border: none;
-  border-radius: 6px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  width: auto;
-  min-width: 120px;
-  align-self: flex-start;
+.form-select:focus {
+    border-color: #356386;
+    background-color: white;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(53, 99, 134, 0.1);
 }
 
-.btn-pdf:hover {
-  background-color: #005f73;
+.form-select option {
+    padding: 10px;
 }
 
-/* Volver al menú */
-.volver-menu {
-  text-align: center;
-  margin-top: 20px;
+/* Botones */
+.form-actions {
+    text-align: center;
+    margin-top: 30px;
 }
 
-.volver-menu a {
-  text-decoration: none;
-  background-color: #64788a;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 6px;
-  font-size: 16px;
-  transition: background-color 0.3s ease;
-  display: inline-block;
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin: 5px;
+    min-width: 180px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-.volver-menu a:hover {
-  background-color: #5a6268;
+.btn i {
+    margin-right: 8px;
+    font-size: 16px;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #356386 0%, #2a4f6b 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #2a4f6b 0%, #1e3a50 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(53, 99, 134, 0.3);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #64788a 0%, #556b7d 100%);
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: linear-gradient(135deg, #556b7d 0%, #465870 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(100, 120, 138, 0.3);
+}
+
+.btn-outline {
+    background: transparent;
+    color: #356386;
+    border: 2px solid #356386;
+}
+
+.btn-outline:hover {
+    background: #356386;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(53, 99, 134, 0.3);
+}
+
+/* No visitas disponibles */
+.no-visitas {
+    text-align: center;
+    padding: 40px 20px;
+    color: #666;
+}
+
+.no-visitas i {
+    font-size: 48px;
+    color: #356386;
+    margin-bottom: 20px;
+}
+
+.no-visitas h3 {
+    color: #0f2c4c;
+    margin: 20px 0 10px 0;
+    font-size: 24px;
+}
+
+.no-visitas p {
+    margin: 10px 0 30px 0;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+/* Botones de navegación */
+.navigation-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container {
+        margin: 15px;
+        padding: 10px;
+    }
+    
+    .header {
+        font-size: 20px;
+        padding: 20px 15px;
+    }
+    
+    .card-header {
+        padding: 25px 20px;
+    }
+    
+    .card-header h1 {
+        font-size: 24px;
+    }
+    
+    .card-body {
+        padding: 25px 20px;
+    }
+    
+    .btn {
+        min-width: auto;
+        width: 100%;
+        margin: 5px 0;
+    }
+    
+    .navigation-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .navigation-buttons .btn {
+        width: 100%;
+        max-width: 300px;
+    }
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.main-card {
+    animation: fadeIn 0.6s ease-out;
+}
+
+.navigation-buttons {
+    animation: fadeIn 0.8s ease-out;
 }

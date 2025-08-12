@@ -3,15 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solicitud de Visita</title>
+    <title>Solicitud de Visita Turística</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/nueva_visita.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/empresas.css') }}">
 </head>
 <body>
     <div class="header">
-        <h1>Formulario de Solicitud de Visita</h1>
+        <h1>📝 Formulario de Solicitud de Visita</h1>
+        <p>Complete todos los datos para registrar una nueva solicitud de visita turística</p>
     </div>
 
     <div class="container">
+        <!-- Información del proceso -->
+        <div class="section">
+            <div class="info-panel">
+                <div class="info-item">
+                    <strong>📋 Proceso de solicitud:</strong> 
+                    1. Complete los datos → 2. Seleccione empresas → 3. Proponga fechas → 4. Envíe la solicitud
+                </div>
+                <div class="info-item">
+                    <strong>🎯 Filtrado automático:</strong> 
+                    Las empresas disponibles se mostrarán automáticamente según el tipo de institución y nivel educativo seleccionados.
+                </div>
+            </div>
+        </div>
+
         <form action="/institucion/solicitar_visita" method="POST" class="form-solicitud">
             <!-- A. DATOS DE LA INSTITUCIÓN -->
             <div class="section">
@@ -23,6 +39,16 @@
                 <div class="form-group">
                     <label for="localidad">Localidad:</label>
                     <input type="text" id="localidad" name="localidad" required>
+                </div>
+                
+                <!-- Nuevo campo para tipo de institución -->
+                <div class="form-group">
+                    <label for="tipo_institucion">Tipo de institución:</label>
+                    <select id="tipo_institucion" name="tipo_institucion" required>
+                        <option value="">Seleccione una opción</option>
+                        <option value="local">Institución Local (Esperanza)</option>
+                        <option value="externa">Institución Externa (Turismo Educativo)</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="director">Nombre del director/a:</label>
@@ -64,10 +90,9 @@
                 <div class="form-group">
                     <label for="nivel_educativo">Nivel educativo del grupo:</label>
                     <select id="nivel_educativo" name="nivel_educativo" required>
-                        <option value="Inicial">Nivel Inicial</option>
+                        <option value="">Seleccione el nivel educativo</option>
                         <option value="Primario">Nivel Primario</option>
                         <option value="Secundario">Nivel Secundario</option>
-                        <option value="Adultos Mayores">Adultos Mayores</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -102,27 +127,12 @@
                 </div>
             </div>
 
-            <!-- C. SELECCIÓN DE LUGARES A VISITAR -->
+            <!-- C. SELECCIÓN DE EMPRESAS A VISITAR -->
             <div class="section">
-                <h2>C. Selección de Lugares a Visitar</h2>
-                <p>Seleccione los lugares que desea incluir en la visita:</p>
-                <div class="lugares-container">
-                    <div class="lugar-item">
-                        <input type="checkbox" id="museo" name="lugares[]" value="Museo de la Colonización">
-                        <label for="museo">Museo de la Colonización</label>
-                    </div>
-                    <div class="lugar-item">
-                        <input type="checkbox" id="liceo" name="lugares[]" value="Liceo Municipal">
-                        <label for="liceo">Liceo Municipal</label>
-                    </div>
-                    <div class="lugar-item">
-                        <input type="checkbox" id="sala_arte" name="lugares[]" value="Sala de Arte">
-                        <label for="sala_arte">Sala de Arte</label>
-                    </div>
-                    <div class="lugar-item">
-                        <input type="checkbox" id="plaza" name="lugares[]" value="Plaza San Martín">
-                        <label for="plaza">Plaza San Martín</label>
-                    </div>
+                <h2>C. Selección de Empresas a Visitar</h2>
+                <p id="cargando-empresas">Seleccione el tipo de institución y nivel educativo para ver las opciones disponibles.</p>
+                <div class="lugares-container" id="empresas-container">
+                    <!-- Las empresas se cargarán dinámicamente aquí -->
                 </div>
             </div>
 
@@ -150,10 +160,153 @@
 
             <!-- Botón Final -->
             <div class="botones">
-                <button type="submit" class="boton-enviar">Enviar Solicitud</button>
-                <a href="{{ url_for('index') }}" class="boton-volver">Volver al Menú</a>
+                <button type="submit" class="boton-enviar">
+                    📨 Enviar Solicitud
+                </button>
+                <a href="{{ url_for('index') }}" class="boton-volver">
+                    🏠 Volver al Menú
+                </a>
             </div>
         </form>
+
+        <!-- Información adicional -->
+        <div class="section">
+            <h2>ℹ️ Información Importante</h2>
+            <div class="info-panel">
+                <div class="info-item">
+                    <strong>⏰ Tiempo de respuesta:</strong> 
+                    Su solicitud será procesada en un plazo de 48-72 horas hábiles.
+                </div>
+                <div class="info-item">
+                    <strong>📞 Contacto:</strong> 
+                    Para consultas urgentes, comuníquese con la Dirección de Turismo de Esperanza.
+                </div>
+                <div class="info-item">
+                    <strong>📚 Niveles admitidos:</strong> 
+                    El sistema está configurado para instituciones de nivel Primario y Secundario únicamente.
+                </div>
+            </div>
+        </div>
     </div>
+    
+    <!-- Estilos específicos para nueva visita -->
+    <style>
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 1.1em;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #005f73;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background-color: #ffffff;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #005f73;
+            box-shadow: 0 0 0 3px rgba(0, 95, 115, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .form-group input[type="radio"],
+        .form-group input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+            transform: scale(1.2);
+            accent-color: #005f73;
+        }
+
+        .botones {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .boton-enviar, .boton-volver {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .boton-enviar {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border: 2px solid #28a745;
+        }
+
+        .boton-enviar:hover {
+            background: linear-gradient(135deg, #218838, #1abc9c);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        .boton-volver {
+            background: linear-gradient(135deg, #6c757d, #495057);
+            color: white;
+            border: 2px solid #6c757d;
+        }
+
+        .boton-volver:hover {
+            background: linear-gradient(135deg, #5a6268, #343a40);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(108, 117, 125, 0.3);
+        }
+
+        #cargando-empresas {
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+            color: #6c757d;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 8px;
+            border: 2px dashed #dee2e6;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .botones {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .boton-enviar, .boton-volver {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+    
+    <!-- Scripts JavaScript -->
+    <script src="{{ url_for('static', filename='js/filtro_empresas.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/validaciones.js') }}"></script>
 </body>
 </html>

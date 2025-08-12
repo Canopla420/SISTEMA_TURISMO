@@ -3,55 +3,351 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consultar, Modificar y Eliminar Visitas</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/consultar_visitas.css') }}">
+    <title>Consultar Visitas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/nueva_visita.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/empresas.css') }}">
+    <!-- Estilos específicos para consultar visitas -->
+    <style>
+        /* Estilos para botones de acción */
+        .acciones-grupo {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 4px;
+        }
+
+        .boton-accion {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.8em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            min-width: 80px;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .boton-accion.editar {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border: 2px solid #007bff;
+        }
+
+        .boton-accion.editar:hover {
+            background: linear-gradient(135deg, #0056b3, #004085);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+        }
+
+        .boton-accion.eliminar {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            border: 2px solid #dc3545;
+        }
+
+        .boton-accion.eliminar:hover {
+            background: linear-gradient(135deg, #c82333, #a71e2a);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+        }
+
+        .boton-accion.confirmar {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border: 2px solid #28a745;
+        }
+
+        .boton-accion.confirmar:hover {
+            background: linear-gradient(135deg, #218838, #1abc9c);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+        }
+
+        .boton-accion.rechazar {
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+            color: white;
+            border: 2px solid #ffc107;
+        }
+
+        .boton-accion.rechazar:hover {
+            background: linear-gradient(135deg, #e0a800, #ef6f00);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
+        }
+
+        /* Ajustar el ancho de la columna de acciones */
+        .tabla-empresas th:last-child,
+        .tabla-empresas td:last-child {
+            width: 280px;
+            min-width: 280px;
+            text-align: center;
+        }
+
+        /* Estilos para formularios inline */
+        .acciones-grupo form {
+            margin: 0;
+            display: inline-block;
+        }
+
+        /* Asegurar que la tabla no se corte */
+        .tabla-container {
+            overflow-x: auto;
+            width: 100%;
+        }
+
+        .tabla-empresas {
+            width: 100%;
+            min-width: 1200px;
+        }
+
+        /* Mejorar estado badges */
+        .estado-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .estado-badge.activa {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .estado-badge.pendiente {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .estado-badge.inactiva {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Responsive para móviles */
+        @media (max-width: 768px) {
+            .tabla-empresas th:last-child,
+            .tabla-empresas td:last-child {
+                width: 200px;
+                min-width: 200px;
+            }
+
+            .acciones-grupo {
+                flex-direction: column;
+                gap: 4px;
+                padding: 6px 2px;
+            }
+
+            .acciones-grupo form {
+                width: 100%;
+                margin: 0;
+            }
+
+            .boton-accion {
+                width: 100%;
+                min-width: 100px;
+                font-size: 0.75em;
+                padding: 5px 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .tabla-container {
+                overflow-x: scroll;
+            }
+            
+            .tabla-empresas {
+                min-width: 900px;
+            }
+        }
+
+        /* Mejorar legibilidad de la tabla */
+        .tabla-empresas {
+            font-size: 0.9em;
+        }
+
+        .tabla-empresas td {
+            vertical-align: middle;
+            padding: 12px 8px;
+        }
+
+        .empresa-info strong {
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .empresa-info small {
+            color: #6c757d;
+            font-size: 0.85em;
+        }
+
+        .personas {
+            text-align: center;
+            font-weight: 600;
+            color: #005f73;
+        }
+    </style>
 </head>
 <body>
     <div class="header">
-        <h1>Consultar, Modificar y Eliminar Visitas</h1>
+        <h1>📋 Consultar Visitas</h1>
+        <p>Consulte y administre todas las visitas registradas en el sistema</p>
     </div>
 
     <div class="container">
-        <h2>Visitas Registradas</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Institución</th>
-                    <th>Fecha</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for visita in visitas %}
-                <tr>
-                    <td>{{ visita.nombre_institucion }}</td>
-                    <td>{{ visita.fecha_visita }}</td>
-                    <td>{{ visita.estado }}</td>
-                    <td>
-                        {% if visita.estado == "Pendiente" %}
-                        <form action="/confirmar_visita/{{ visita.id }}" method="POST" style="display:inline;">
-                            <button type="submit" class="boton-confirmar">Confirmar</button>
-                        </form>
-                        {% elif visita.estado == "Confirmada" %}
-                        <form action="/rechazar_visita/{{ visita.id }}" method="POST" style="display:inline;">
-                            <button type="submit" class="boton-rechazar">Rechazar</button>
-                        </form>
-                        {% endif %}
-                        <form action="/modificar_visita/{{ visita.id }}" method="GET" style="display:inline;">
-                            <button type="submit" class="boton-modificar">Modificar</button>
-                        </form>
-                        <form action="/eliminar_visita/{{ visita.id }}" method="POST" style="display:inline;">
-                            <button type="submit" class="boton-eliminar">Eliminar</button>
-                        </form>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <a href="{{ url_for('index') }}" class="boton-volver">Volver al Menú</a>
-    </div>
+        <!-- Formulario de búsqueda -->
+        <div class="section">
+            <h2>🔍 Buscar Visitas</h2>
+            <form method="POST" action="{{ url_for('consultar_visitas') }}" class="form-solicitud">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nombre_institucion">🏫 Nombre de la institución:</label>
+                        <input type="text" id="nombre_institucion" name="nombre_institucion" 
+                               value="{{ nombre_institucion or '' }}" placeholder="Escriba el nombre de la institución...">
+                    </div>
+                    <div class="form-group">
+                        <label for="estado">📊 Estado de la visita:</label>
+                        <select id="estado" name="estado">
+                            <option value="">Todos los estados</option>
+                            <option value="Pendiente" {% if estado == 'Pendiente' %}selected{% endif %}>⏳ Pendiente</option>
+                            <option value="Confirmada" {% if estado == 'Confirmada' %}selected{% endif %}>✅ Confirmada</option>
+                            <option value="Rechazada" {% if estado == 'Rechazada' %}selected{% endif %}>❌ Rechazada</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="botones">
+                    <button type="submit" class="boton-enviar">🔍 Buscar</button>
+                </div>
+            </form>
+        </div>
 
-    <script src="{{ url_for('static', filename='js/consultar_visitas.js') }}"></script>
+        <!-- Botones de navegación -->
+        <div class="section">
+            <div class="botones">
+                <a href="{{ url_for('solicitar_visita_institucion') }}" class="boton-enviar">➕ Nueva Visita</a>
+                <a href="{{ url_for('index') }}" class="boton-volver">🏠 Volver al Menú Principal</a>
+            </div>
+        </div>
+        
+        <!-- Tabla de resultados -->
+        <div class="section">
+            <h2>📋 Lista de Visitas</h2>
+            {% if visitas %}
+            <div class="tabla-container">
+                <table class="tabla-empresas">
+                    <thead>
+                        <tr>
+                            <th>🏫 Institución</th>
+                            <th>📧 Correo</th>
+                            <th>📞 Teléfono</th>
+                            <th>📅 Fecha de Visita</th>
+                            <th>👥 Cantidad de Alumnos</th>
+                            <th>📊 Estado</th>
+                            <th>⚙️ Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for visita in visitas %}
+                        <tr>
+                            <td class="empresa-celda">
+                                <div class="empresa-info">
+                                    <strong>{{ visita.nombre_institucion }}</strong>
+                                    {% if visita.localidad %}
+                                    <small>📍 {{ visita.localidad }}</small>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>{{ visita.correo_institucional }}</td>
+                            <td>{{ visita.telefono_institucion }}</td>
+                            <td>{{ visita.fecha_visita }}</td>
+                            <td class="personas">{{ visita.cantidad_alumnos }}</td>
+                            <td>
+                                <span class="estado-badge 
+                                    {% if visita.estado == 'Confirmada' %}activa
+                                    {% elif visita.estado == 'Pendiente' %}pendiente
+                                    {% else %}inactiva{% endif %}">
+                                    {% if visita.estado == 'Confirmada' %}
+                                    ✅ Confirmada
+                                    {% elif visita.estado == 'Pendiente' %}
+                                    ⏳ Pendiente
+                                    {% else %}
+                                    ❌ Rechazada
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="acciones-grupo">
+                                    {% if visita.estado == 'Pendiente' %}
+                                    <form action="{{ url_for('confirmar_visita', id=visita.id) }}" method="POST" style="display:inline;">
+                                        <button type="submit" class="boton-accion confirmar" title="Confirmar visita">
+                                            ✅ Confirmar
+                                        </button>
+                                    </form>
+                                    {% elif visita.estado == 'Confirmada' %}
+                                    <form action="{{ url_for('rechazar_visita', id=visita.id) }}" method="POST" style="display:inline;">
+                                        <button type="submit" class="boton-accion rechazar" title="Rechazar visita"
+                                                onclick="return confirm('¿Está seguro de rechazar la visita de {{ visita.nombre_institucion }}?')">
+                                            ❌ Rechazar
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                    
+                                    <a href="{{ url_for('modificar_visita', id=visita.id) }}" class="boton-accion editar">
+                                        ✏️ Editar
+                                    </a>
+                                    <form action="{{ url_for('eliminar_visita', id=visita.id) }}" method="POST" style="display:inline;">
+                                        <button type="submit" class="boton-accion eliminar" title="Eliminar visita"
+                                                onclick="return confirm('¿Está seguro de eliminar definitivamente la visita de {{ visita.nombre_institucion }}?')">
+                                            🗑️ Eliminar
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="mensaje-vacio">
+                <div class="icono-vacio">📝</div>
+                <h3>No se encontraron visitas</h3>
+                <p>No hay visitas que coincidan con los criterios de búsqueda.</p>
+                <a href="{{ url_for('solicitar_visita_institucion') }}" class="boton-enviar">➕ Crear Primera Visita</a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Panel de información -->
+        <div class="section">
+            <div class="info-panel">
+                <div class="info-item">
+                    <strong>💡 Consejos:</strong> 
+                    Use los filtros para encontrar visitas específicas por institución o estado.
+                </div>
+                <div class="info-item">
+                    <strong>⚙️ Acciones:</strong> 
+                    Puede modificar los detalles de una visita o eliminarla completamente del sistema.
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/eliminar_visita.js') }}"></script>
 </body>
 </html>
