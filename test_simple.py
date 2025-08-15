@@ -1,82 +1,57 @@
-"""
-Test simple para verificar el filtrado de empresas
-"""
-import sys
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import psycopg2
 import os
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from app import app, db, EmpresaTuristica
-
-def test_filtrado_basico():
-    """Test básico del sistema de filtrado"""
-    print("🧪 INICIANDO TESTS BÁSICOS")
-    
-    with app.app_context():
-        # Crear base de datos si no existe
-        db.create_all()
+def test_connection_bypass():
+    try:
+        print("🔍 PROBANDO CONEXIÓN CON BYPASS UTF-8...")
         
-        # Verificar si hay empresas
-        count = EmpresaTuristica.query.count()
-        print(f"📊 Empresas en BD: {count}")
+        # Intentar conexión con configuración específica para Windows
+        connection_string = "host=localhost port=5432 dbname=turismo_db user=turismo_user password=turismo_pass"
         
-        if count == 0:
-            print("➕ Creando empresas de prueba...")
-            # Crear empresa de identidad
-            empresa1 = EmpresaTuristica(
-                nombre="Museo Test",
-                correo="test@museo.com",
-                categoria_turismo="identidad",
-                nivel_educativo_objetivo="Primario",
-                activa=True
-            )
-            
-            # Crear empresa educativa
-            empresa2 = EmpresaTuristica(
-                nombre="Granja Test",
-                correo="test@granja.com",
-                categoria_turismo="educativo",
-                nivel_educativo_objetivo="Secundario",
-                activa=True
-            )
-            
-            db.session.add(empresa1)
-            db.session.add(empresa2)
-            db.session.commit()
-            print("✅ Empresas de prueba creadas")
+        conn = psycopg2.connect(
+            connection_string,
+            connect_timeout=10
+        )
         
-        # Test de filtrado
-        with app.test_client() as client:
-            print("🔍 Probando filtros...")
-            
-            # Test 1: Instituciones locales + Primario
-            response = client.get('/empresas_filtradas?es_de_esperanza=true&nivel_educativo=Primario')
-            if response.status_code == 200:
-                data = response.get_json()
-                print(f"✅ Local/Primario: {len(data)} empresas")
-                for emp in data:
-                    print(f"   - {emp['nombre']} ({emp['categoria_turismo']})")
-            else:
-                print(f"❌ Error Local/Primario: {response.status_code}")
-            
-            # Test 2: Instituciones externas + Secundario
-            response = client.get('/empresas_filtradas?es_de_esperanza=false&nivel_educativo=Secundario')
-            if response.status_code == 200:
-                data = response.get_json()
-                print(f"✅ Externa/Secundario: {len(data)} empresas")
-                for emp in data:
-                    print(f"   - {emp['nombre']} ({emp['categoria_turismo']})")
-            else:
-                print(f"❌ Error Externa/Secundario: {response.status_code}")
+        # Configurar la conexión para UTF-8
+        conn.set_client_encoding('UTF8')
         
-        print("\n🎯 INSTRUCCIONES PARA PRUEBA MANUAL:")
-        print("1. Ejecuta: python app.py")
-        print("2. Ve a: http://localhost:5000/institucion/solicitar_visita")
-        print("3. Abre herramientas de desarrollador (F12) → Console")
-        print("4. Completa los campos:")
-        print("   - Tipo de institución: Local o Externa")
-        print("   - Nivel educativo: Primario o Secundario")
-        print("5. Observa los logs en la consola del navegador")
-        print("6. Las empresas deberían aparecer automáticamente")
+        cursor = conn.cursor()
+        print("✅ Conexión exitosa")
+        
+        # Probar consulta simple
+        cursor.execute("SELECT COUNT(*) FROM empresa_turistica")
+        count = cursor.fetchone()[0]
+        print(f"🏢 Empresas encontradas: {count}")
+        
+        if count > 0:
+            cursor.execute("SELECT nombre FROM empresa_turistica LIMIT 3")
+            empresas = cursor.fetchall()
+            print("📝 Nombres de empresas:")
+            for empresa in empresas:
+                print(f"  - {empresa[0]}")
+        
+        cursor.execute("SELECT COUNT(*) FROM solicitud_visita")
+        solicitudes = cursor.fetchone()[0]
+        print(f"📝 Solicitudes encontradas: {solicitudes}")
+        
+        conn.close()
+        
+    except Exception as e:
+        print(f"❌ Error en conexión: {e}")
+        
+        # Plan B: Verificar desde Adminer directamente
+        print("\n🔄 PLAN B: Verificar en Adminer...")
+        print("1. Ve a http://localhost:8080")
+        print("2. Conecta con:")
+        print("   - Servidor: localhost:5432")
+        print("   - Usuario: turismo_user")
+        print("   - Contraseña: turismo_pass")
+        print("   - Base de datos: turismo_db")
+        print("3. Ve a la tabla 'empresa_turistica' y verifica los datos")
 
 if __name__ == "__main__":
-    test_filtrado_basico()
+    test_connection_bypass()

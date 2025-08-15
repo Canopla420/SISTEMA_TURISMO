@@ -1,12 +1,21 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import os
+import sys
+
+# Configurar codificación UTF-8
+if sys.platform.startswith('win'):
+    os.environ['PYTHONIOENCODING'] = 'utf-8'
+
 from flask import Flask, request, jsonify, render_template, redirect, url_for, send_file
-from flask_mail import Mail, Message
+from flask_mail import Mail
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import inch
 import io
-import os
-from datetime import datetime, date
+from datetime import datetime
 from reportlab.lib.pagesizes import letter
 from dotenv import load_dotenv
 from config import config
@@ -28,126 +37,58 @@ migrate = Migrate(app, db)
 # Definición de los modelos
 # ------------------------------
 
-class SolicitudVisita(db.Model):
-    __tablename__ = 'solicitudes_visita'
+class Usuario(db.Model):
+    __tablename__ = 'usuario'
     
     id = db.Column(db.Integer, primary_key=True)
-    nombre_institucion = db.Column(db.String(100), nullable=False)
-    localidad = db.Column(db.String(100), nullable=False)
-    # Nuevo campo para categorizar el tipo de institución
-    tipo_institucion = db.Column(db.String(20), nullable=False)  # 'local' o 'externa'
-    es_de_esperanza = db.Column(db.Boolean, default=False)  # True si es de Esperanza (nuestra identidad)
-    director = db.Column(db.String(100), nullable=False)
-    correo_institucional = db.Column(db.String(100), nullable=False)
-    telefono_institucion = db.Column(db.String(20), nullable=False)
-    contacto_principal = db.Column(db.String(100), nullable=False)
-    telefono_contacto_principal = db.Column(db.String(20), nullable=False)
-    relacion_contacto = db.Column(db.String(50), nullable=False)
-    contacto_suplente = db.Column(db.String(100), nullable=True)
-    telefono_contacto_suplente = db.Column(db.String(20), nullable=True)
-    nivel_educativo = db.Column(db.String(50), nullable=False)  # 'Primario' o 'Secundario'
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    rol = db.Column(db.String(50), nullable=False, default='Usuario')
+    fecha_creacion = db.Column(db.DateTime, default=datetime.utcnow)
+
+class SolicitudVisita(db.Model):
+    __tablename__ = 'solicitud_visita'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    nombre_institucion = db.Column(db.String(200), nullable=False)
+    responsable = db.Column(db.String(100), nullable=False)
+    telefono = db.Column(db.String(50), nullable=False)
+    email = db.Column(db.String(120), nullable=False)
     cantidad_alumnos = db.Column(db.Integer, nullable=False)
-    edad_alumnos = db.Column(db.String(50), nullable=False)
-    discapacidad = db.Column(db.String(10), nullable=False)
-    tipo_discapacidad = db.Column(db.String(100), nullable=True)
-    adaptacion = db.Column(db.String(10), nullable=True)
-    empresas_seleccionadas = db.Column(db.Text, nullable=False)  # JSON string con empresas seleccionadas
-    fecha_visita = db.Column(db.Date, nullable=False)
+    edad_alumnos = db.Column(db.String(50), nullable=True)
+    discapacidad = db.Column(db.String(10), default='No')
+    empresas_seleccionadas = db.Column(db.Text, nullable=True)
+    fecha_visita = db.Column(db.Date, nullable=True)
     hora_grupo1 = db.Column(db.Time, nullable=True)
     hora_grupo2 = db.Column(db.Time, nullable=True)
     observaciones = db.Column(db.Text, nullable=True)
-    estado = db.Column(db.String(20), default="Pendiente")  # Pendiente, Confirmada, Realizada, Cancelada
-    fecha_creacion = db.Column(db.DateTime, default=datetime.utcnow)
-    fecha_actualizacion = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
-    # Relaciones
-    visitas_realizadas = db.relationship('VisitaRealizada', backref='solicitud', lazy=True, cascade='all, delete-orphan')
-    itinerarios = db.relationship('Itinerario', backref='solicitud', lazy=True, cascade='all, delete-orphan')
+    estado = db.Column(db.String(50), default='Pendiente')
+    fecha_solicitud = db.Column(db.DateTime, default=datetime.utcnow)
 
 class EmpresaTuristica(db.Model):
-    __tablename__ = 'empresas_turisticas'
+    __tablename__ = 'empresa_turistica'
     
     id = db.Column(db.Integer, primary_key=True)
-    nombre = db.Column(db.String(100), nullable=False, unique=True)
-    correo = db.Column(db.String(100), nullable=False)
-    telefono = db.Column(db.String(20), nullable=True)
-    direccion = db.Column(db.String(200), nullable=True)
-    servicios_ofrecidos = db.Column(db.Text, nullable=True)
+    nombre = db.Column(db.String(200), nullable=False)
     descripcion = db.Column(db.Text, nullable=True)
-    
-    # Nuevos campos para categorización
-    categoria_turismo = db.Column(db.String(20), nullable=False)  # 'identidad' o 'educativo'
-    nivel_educativo_objetivo = db.Column(db.String(50), nullable=False)  # 'Primario', 'Secundario', 'Ambos'
-    
-    # Campos adicionales
+    direccion = db.Column(db.String(200), nullable=True)
+    telefono = db.Column(db.String(50), nullable=True)
+    email = db.Column(db.String(120), nullable=True)
+    categoria = db.Column(db.String(50), nullable=False)
     capacidad_maxima = db.Column(db.Integer, nullable=True)
-    horarios_atencion = db.Column(db.String(100), nullable=True)
-    costo_por_persona = db.Column(db.Numeric(10, 2), nullable=True)
-    requiere_reserva = db.Column(db.Boolean, default=True)
-    activa = db.Column(db.Boolean, default=True)
-    fecha_registro = db.Column(db.DateTime, default=datetime.utcnow)
-    fecha_actualizacion = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
-    # Relaciones
-    consultas = db.relationship('ConsultaEmpresa', backref='empresa', lazy=True, cascade='all, delete-orphan')
-    visitas_realizadas = db.relationship('VisitaRealizada', backref='empresa', lazy=True)
-
-class VisitaRealizada(db.Model):
-    __tablename__ = 'visitas_realizadas'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    solicitud_id = db.Column(db.Integer, db.ForeignKey('solicitudes_visita.id'), nullable=False)
-    empresa_id = db.Column(db.Integer, db.ForeignKey('empresas_turisticas.id'), nullable=True)
-    fecha_realizada = db.Column(db.Date, nullable=False)
-    hora_inicio = db.Column(db.Time, nullable=True)
-    hora_fin = db.Column(db.Time, nullable=True)
-    calificacion = db.Column(db.Integer, nullable=True)  # 1-5 estrellas
-    comentarios_finales = db.Column(db.Text, nullable=True)
-    costo_total = db.Column(db.Numeric(10, 2), nullable=True)
-    cantidad_participantes_real = db.Column(db.Integer, nullable=True)
-    guia_asignado = db.Column(db.String(100), nullable=True)
-    clima = db.Column(db.String(50), nullable=True)
-    incidentes = db.Column(db.Text, nullable=True)
-    fecha_registro = db.Column(db.DateTime, default=datetime.utcnow)
-
-class ConsultaEmpresa(db.Model):
-    __tablename__ = 'consultas_empresas'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    empresa_id = db.Column(db.Integer, db.ForeignKey('empresas_turisticas.id'), nullable=False)
-    fecha_consulta = db.Column(db.Date, nullable=False)
-    hora_consulta = db.Column(db.Time, nullable=False)
-    comentarios = db.Column(db.Text, nullable=True)
-    fecha_envio = db.Column(db.DateTime, default=datetime.utcnow)
-    respondida = db.Column(db.Boolean, default=False)
-    respuesta = db.Column(db.Text, nullable=True)
-    fecha_respuesta = db.Column(db.DateTime, nullable=True)
-    estado = db.Column(db.String(20), default="Enviada")  # Enviada, Respondida, Sin respuesta
-
-class Itinerario(db.Model):
-    __tablename__ = 'itinerarios'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    solicitud_id = db.Column(db.Integer, db.ForeignKey('solicitudes_visita.id'), nullable=False)
+    duracion_visita = db.Column(db.String(50), nullable=True)
     fecha_creacion = db.Column(db.DateTime, default=datetime.utcnow)
-    ruta_archivo = db.Column(db.String(200), nullable=True)
-    observaciones_itinerario = db.Column(db.Text, nullable=True)
-    version = db.Column(db.Integer, default=1)
-    creado_por = db.Column(db.String(100), nullable=True)
 
-class Usuario(db.Model):
-    __tablename__ = 'usuarios'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(50), unique=True, nullable=False)
-    email = db.Column(db.String(100), unique=True, nullable=False)
-    password_hash = db.Column(db.String(128), nullable=False)
-    nombre_completo = db.Column(db.String(100), nullable=False)
-    rol = db.Column(db.String(20), default="operador")  # admin, operador
-    activo = db.Column(db.Boolean, default=True)
-    ultimo_acceso = db.Column(db.DateTime, nullable=True)
-    fecha_creacion = db.Column(db.DateTime, default=datetime.utcnow)
-    
+# Comentado temporalmente para evitar errores
+# class VisitaRealizada(db.Model):
+#     __tablename__ = 'visitas_realizadas'
+# 
+# class ConsultaEmpresa(db.Model):
+#     __tablename__ = 'consultas_empresas'
+# 
+# class Itinerario(db.Model):
+#     __tablename__ = 'itinerarios'
+
 # ------------------------------
 # Configuración de migraciones
 # ------------------------------
@@ -168,6 +109,139 @@ mail = Mail(app)
 @app.route('/', methods=['GET'])
 def index():
     return render_template('index.html')
+
+@app.route('/diagnostico')
+def diagnostico():
+    """Ruta para diagnosticar el estado de la base de datos"""
+    try:
+        # Verificar conexión
+        result = db.session.execute(db.text("SELECT 1"))
+        conexion_ok = True
+        
+        # Contar registros
+        empresas_count = db.session.execute(db.text("SELECT COUNT(*) FROM empresa_turistica")).scalar()
+        solicitudes_count = db.session.execute(db.text("SELECT COUNT(*) FROM solicitud_visita")).scalar()
+        usuarios_count = db.session.execute(db.text("SELECT COUNT(*) FROM usuario")).scalar()
+        
+        # Obtener algunas empresas
+        empresas_result = db.session.execute(db.text("SELECT nombre FROM empresa_turistica LIMIT 3"))
+        empresas_nombres = [row[0] for row in empresas_result]
+        
+        diagnostico_info = f"""
+        🔍 DIAGNÓSTICO DE BASE DE DATOS
+        ================================
+        ✅ Conexión: {'OK' if conexion_ok else 'ERROR'}
+        
+        📊 CONTADORES:
+        - Empresas: {empresas_count}
+        - Solicitudes: {solicitudes_count}  
+        - Usuarios: {usuarios_count}
+        
+        📝 EMPRESAS ENCONTRADAS:
+        {chr(10).join(['- ' + nombre for nombre in empresas_nombres]) if empresas_nombres else 'Ninguna'}
+        
+        🔧 ACCIONES:
+        - <a href="/cargar_datos_iniciales">Cargar datos iniciales</a>
+        - <a href="/gestionar_empresas">Ver gestión de empresas</a>
+        - <a href="/">Volver al inicio</a>
+        """
+        
+        return f"<pre>{diagnostico_info}</pre>"
+        
+    except Exception as e:
+        return f"❌ Error en diagnóstico: {e}"
+
+@app.route('/cargar_datos_iniciales')
+def cargar_datos_iniciales():
+    """Ruta especial para cargar datos iniciales en la base de datos"""
+    try:
+        # Verificar si ya hay datos
+        empresas_count = EmpresaTuristica.query.count()
+        if empresas_count > 0:
+            return f"✅ Ya hay {empresas_count} empresas en la base de datos. No es necesario cargar datos."
+        
+        # Crear datos de ejemplo
+        empresas_data = [
+            {
+                'nombre': 'Museo Histórico de la Colonización Esperanza',
+                'descripcion': 'Museo que preserva la historia de la colonización suiza-alemana',
+                'direccion': 'Av. San Martín 402',
+                'telefono': '(03496) 420-789',
+                'email': 'museo@esperanza.gov.ar',
+                'categoria': 'Turismo de Identidad',
+                'capacidad_maxima': 40,
+                'duracion_visita': '90 minutos'
+            },
+            {
+                'nombre': 'Centro Cultural Municipal Casa Diefenbach',
+                'descripcion': 'Centro cultural en edificio histórico de 1920',
+                'direccion': 'Calle 25 de Mayo 356',
+                'telefono': '(03496) 420-123',
+                'email': 'cultura@esperanza.gov.ar',
+                'categoria': 'Turismo de Identidad',
+                'capacidad_maxima': 60,
+                'duracion_visita': '75 minutos'
+            },
+            {
+                'nombre': 'Iglesia San Pedro',
+                'descripcion': 'Primera iglesia de la colonia suiza, construida en 1862',
+                'direccion': 'Plaza San Martín s/n',
+                'telefono': '(03496) 420-456',
+                'email': 'sanpedro@esperanza.gov.ar',
+                'categoria': 'Turismo de Identidad',
+                'capacidad_maxima': 80,
+                'duracion_visita': '60 minutos'
+            },
+            {
+                'nombre': 'Granja Educativa Los Aromos',
+                'descripcion': 'Experiencia educativa en granja con animales de granja',
+                'direccion': 'Ruta Provincial 70 Km 8',
+                'telefono': '(03496) 421-555',
+                'email': 'info@granjalosaromos.com',
+                'categoria': 'Turismo Educativo',
+                'capacidad_maxima': 50,
+                'duracion_visita': '3 horas'
+            },
+            {
+                'nombre': 'Reserva Natural Municipal',
+                'descripcion': 'Reserva natural con senderos interpretativos y fauna nativa',
+                'direccion': 'Camino Rural al Río Salado',
+                'telefono': '(03496) 421-777',
+                'email': 'reserva@esperanza.gov.ar',
+                'categoria': 'Turismo Educativo',
+                'capacidad_maxima': 35,
+                'duracion_visita': '2.5 horas'
+            }
+        ]
+        
+        # Insertar empresas
+        for empresa_data in empresas_data:
+            empresa = EmpresaTuristica(**empresa_data)
+            db.session.add(empresa)
+        
+        # Crear solicitud de ejemplo
+        solicitud = SolicitudVisita(
+            nombre_institucion='Escuela Primaria Nacional Esperanza',
+            responsable='María González',
+            telefono='(03496) 420-999',
+            email='direccion@escuelaesperanza.edu.ar',
+            cantidad_alumnos=25,
+            edad_alumnos='8 a 10 años',
+            discapacidad='No',
+            empresas_seleccionadas='Museo Histórico de la Colonización Esperanza,Centro Cultural Municipal Casa Diefenbach',
+            observaciones='Grupo interesado en historia local.',
+            estado='Confirmada'
+        )
+        db.session.add(solicitud)
+        
+        # Guardar cambios
+        db.session.commit()
+        
+        return "✅ ¡Datos cargados exitosamente! Ahora puedes ver las empresas y visitas en la aplicación."
+        
+    except Exception as e:
+        db.session.rollback()
+        return f"❌ Error cargando datos: {e}"
 
 @app.route('/institucion/solicitar_visita', methods=['GET', 'POST'])
 def solicitar_visita_institucion():
@@ -235,7 +309,7 @@ def solicitar_visita_institucion():
             db.session.add(solicitud)
             db.session.commit()
             return redirect(url_for('confirmacion_visita'))
-        except Exception as e:
+        except (ValueError, TypeError, OSError) as e:
             db.session.rollback()
             print(f"Error al guardar solicitud: {e}")
             return "Error al procesar la solicitud", 500
@@ -244,10 +318,10 @@ def solicitar_visita_institucion():
     # Las empresas se filtrarán dinámicamente según el tipo de institución y nivel educativo
     return render_template('nueva_visita.html')
 
-@app.route('/modificar_visita/<int:id>', methods=['GET', 'POST'])
-def modificar_visita(id):
+@app.route('/modificar_visita/<int:visita_id>', methods=['GET', 'POST'])
+def modificar_visita(visita_id):
     """Modificar una visita existente"""
-    visita = SolicitudVisita.query.get_or_404(id)  # Buscar la visita por ID
+    visita = SolicitudVisita.query.get_or_404(visita_id)  # Buscar la visita por ID
 
     if request.method == 'POST':
         try:
@@ -306,7 +380,7 @@ def modificar_visita(id):
             db.session.commit()
             return redirect(url_for('consultar_visitas'))  # Redirigir a la página de consultar visitas
             
-        except Exception as e:
+        except (ValueError, TypeError) as e:
             db.session.rollback()
             print(f"Error al modificar visita: {e}")
             return f"Error al modificar visita: {e}", 500
@@ -320,12 +394,12 @@ def confirmacion_visita():
     """Página de confirmación después de enviar una solicitud"""
     return render_template('confirmacion_carga_visita.html')
 
-@app.route('/eliminar_visita/<int:id>', methods=['POST'])
-def eliminar_visita(id):
+@app.route('/eliminar_visita/<int:visita_id>', methods=['POST'])
+def eliminar_visita(visita_id):
     """Eliminar una visita por su ID"""
     try:
         # Buscar la visita por ID
-        visita = SolicitudVisita.query.get_or_404(id)
+        visita = SolicitudVisita.query.get_or_404(visita_id)
         
         # Eliminar la visita
         db.session.delete(visita)
@@ -333,7 +407,7 @@ def eliminar_visita(id):
         
         # Redirigir a la página de consultar visitas
         return redirect(url_for('consultar_visitas'))
-    except Exception as e:
+    except (ValueError, TypeError, OSError) as e:
         db.session.rollback()
         print(f"Error al eliminar visita: {e}")
         return redirect(url_for('consultar_visitas'))
@@ -343,30 +417,30 @@ def nueva_visita():
     """Formulario para registrar una nueva visita"""
     return render_template('nueva_visita.html')
 
-@app.route('/confirmar_visita/<int:id>', methods=['POST'])
-def confirmar_visita(id):
+@app.route('/confirmar_visita/<int:visita_id>', methods=['POST'])
+def confirmar_visita(visita_id):
     """Confirmar una visita por su ID"""
     try:
-        visita = SolicitudVisita.query.get_or_404(id)
+        visita = SolicitudVisita.query.get_or_404(visita_id)
         if visita.estado == "Pendiente":
             visita.estado = "Confirmada"
             db.session.commit()
         return redirect(url_for('consultar_visitas'))
-    except Exception as e:
+    except (ValueError, TypeError, OSError) as e:
         db.session.rollback()
         print(f"Error al confirmar visita: {e}")
         return redirect(url_for('consultar_visitas'))
 
-@app.route('/rechazar_visita/<int:id>', methods=['POST'])
-def rechazar_visita(id):
+@app.route('/rechazar_visita/<int:visita_id>', methods=['POST'])
+def rechazar_visita(visita_id):
     """Rechazar una visita por su ID"""
     try:
-        visita = SolicitudVisita.query.get_or_404(id)
+        visita = SolicitudVisita.query.get_or_404(visita_id)
         if visita.estado in ["Confirmada", "Pendiente"]:
             visita.estado = "Rechazada"
             db.session.commit()
         return redirect(url_for('consultar_visitas'))
-    except Exception as e:
+    except (ValueError, TypeError, OSError) as e:
         db.session.rollback()
         print(f"Error al rechazar visita: {e}")
         return redirect(url_for('consultar_visitas'))
@@ -400,7 +474,7 @@ def consultar_visitas():
                              visitas=visitas, 
                              nombre_institucion=nombre_institucion, 
                              estado=estado)
-    except Exception as e:
+    except (ValueError, TypeError, OSError) as e:
         print(f"Error en consultar_visitas: {e}")
         # Devolver una página con lista vacía en caso de error
         return render_template('consultar_visitas.html', 
@@ -437,7 +511,7 @@ def todas_empresas():
                 "costo_por_persona": float(empresa.costo_por_persona) if empresa.costo_por_persona else None
             })
         return jsonify(empresas_json)
-    except Exception as e:
+    except (ValueError, TypeError, OSError) as e:
         print(f"Error al obtener empresas: {e}")
         return jsonify([])
 
@@ -479,7 +553,7 @@ def empresas_filtradas():
             })
         
         return jsonify(empresas_json)
-    except Exception as e:
+    except (ValueError, TypeError, OSError) as e:
         print(f"Error al filtrar empresas: {e}")
         return jsonify([])
 
@@ -502,7 +576,7 @@ def buscar_empresa():
                 "telefono": empresa.telefono
             })
         return jsonify(coincidencias)
-    except Exception as e:
+    except (ValueError, TypeError, OSError) as e:
         print(f"Error en búsqueda de empresas: {e}")
         return jsonify([])
 
@@ -528,14 +602,14 @@ def enviar_consulta():
         fecha_consulta = datetime.strptime(fecha_str, '%Y-%m-%d').date()
         hora_consulta = datetime.strptime(hora_str, '%H:%M').time()
 
-        # Guardar la consulta en la base de datos
-        consulta = ConsultaEmpresa(
-            empresa_id=empresa.id,
-            fecha_consulta=fecha_consulta,
-            hora_consulta=hora_consulta,
-            comentarios=comentarios
-        )
-        db.session.add(consulta)
+        # Guardar la consulta en la base de datos - COMENTADO TEMPORALMENTE
+        # consulta = ConsultaEmpresa(
+        #     empresa_id=empresa.id,
+        #     fecha_consulta=fecha_consulta,
+        #     hora_consulta=hora_consulta,
+        #     comentarios=comentarios
+        # )
+        # db.session.add(consulta)
         db.session.commit()
 
         # Crear y enviar el correo (comentado para evitar errores sin configuración real)
@@ -560,7 +634,7 @@ def enviar_consulta():
         
         return jsonify({"mensaje": "Consulta registrada correctamente"}), 200
         
-    except Exception as e:
+    except (ValueError, TypeError, OSError) as e:
         db.session.rollback()
         print(f"Error al procesar consulta: {e}")
         return jsonify({"error": "No se pudo procesar la consulta"}), 500
@@ -572,7 +646,7 @@ def gestionar_empresas():
     try:
         empresas = EmpresaTuristica.query.all()
         return render_template('gestionar_empresas.html', empresas=empresas)
-    except Exception as e:
+    except (ValueError, TypeError, OSError) as e:
         print(f"Error en gestionar_empresas: {e}")
         # Devolver una página con lista vacía en caso de error
         return render_template('gestionar_empresas.html', empresas=[])
@@ -605,17 +679,17 @@ def agregar_empresa():
             db.session.add(empresa)
             db.session.commit()
             return redirect(url_for('gestionar_empresas'))
-        except Exception as e:
+        except (ValueError, TypeError, OSError) as e:
             db.session.rollback()
             print(f"Error al agregar empresa: {e}")
             return "Error al agregar empresa", 500
     
     return render_template('agregar_empresa.html')
 
-@app.route('/editar_empresa/<int:id>', methods=['GET', 'POST'])
-def editar_empresa(id):
+@app.route('/editar_empresa/<int:empresa_id>', methods=['GET', 'POST'])
+def editar_empresa(empresa_id):
     """Editar una empresa existente"""
-    empresa = EmpresaTuristica.query.get_or_404(id)
+    empresa = EmpresaTuristica.query.get_or_404(empresa_id)
     
     if request.method == 'POST':
         try:
@@ -641,22 +715,22 @@ def editar_empresa(id):
             
             db.session.commit()
             return redirect(url_for('gestionar_empresas'))
-        except Exception as e:
+        except (ValueError, TypeError, OSError) as e:
             db.session.rollback()
             print(f"Error al editar empresa: {e}")
             return "Error al editar empresa", 500
     
     return render_template('editar_empresa.html', empresa=empresa)
 
-@app.route('/eliminar_empresa/<int:id>', methods=['POST'])
-def eliminar_empresa(id):
+@app.route('/eliminar_empresa/<int:empresa_id>', methods=['POST'])
+def eliminar_empresa(empresa_id):
     """Desactivar una empresa (soft delete)"""
     try:
-        empresa = EmpresaTuristica.query.get_or_404(id)
+        empresa = EmpresaTuristica.query.get_or_404(empresa_id)
         empresa.activa = False
         db.session.commit()
         return redirect(url_for('gestionar_empresas'))
-    except Exception as e:
+    except (ValueError, TypeError, OSError) as e:
         db.session.rollback()
         print(f"Error al eliminar empresa: {e}")
         return redirect(url_for('gestionar_empresas'))
@@ -664,14 +738,6 @@ def eliminar_empresa(id):
 # ------------------------------
 # Rutas relacionadas con visitas
 # ------------------------------
-
-@app.route('/guardar_visita', methods=['POST'])
-def guardar_visita():
-    """Guarda los datos de una nueva visita"""
-    # Aquí podrías guardar los datos en una base de datos o archivo
-    # datos = request.form (si lo necesitás)
-    return redirect(url_for('nueva_visita', exito=True))
-
 
 @app.route('/crear_itinerario', methods=['GET', 'POST'])
 def crear_itinerario():
@@ -749,19 +815,19 @@ def crear_itinerario():
 
             p.save()
             
-            # Guardar registro del itinerario en la base de datos
-            itinerario = Itinerario(
-                solicitud_id=visita.id,
-                observaciones_itinerario="Itinerario generado automáticamente",
-                creado_por="Sistema"
-            )
-            db.session.add(itinerario)
-            db.session.commit()
+            # Guardar registro del itinerario en la base de datos - COMENTADO TEMPORALMENTE
+            # itinerario = Itinerario(
+            #     solicitud_id=visita.id,
+            #     observaciones_itinerario="Itinerario generado automáticamente",
+            #     creado_por="Sistema"
+            # )
+            # db.session.add(itinerario)
+            # db.session.commit()
             
             buffer.seek(0)
             return send_file(buffer, as_attachment=True, download_name="itinerario.pdf", mimetype='application/pdf')
             
-        except Exception as e:
+        except (ValueError, TypeError, OSError) as e:
             print(f"Error al crear itinerario: {e}")
             return "Error al generar itinerario", 500
 
@@ -769,7 +835,7 @@ def crear_itinerario():
     try:
         visitas = SolicitudVisita.query.filter_by(estado="Confirmada").all()
         return render_template('crear_itinerario.html', visitas=visitas)
-    except Exception as e:
+    except (ValueError, TypeError, OSError) as e:
         print(f"Error al obtener visitas: {e}")
         return render_template('crear_itinerario.html', visitas=[])
 
