@@ -3,7 +3,6 @@ Script de diagnóstico para la base de datos
 """
 import os
 import sqlite3
-from datetime import datetime
 
 def diagnosticar_bd():
     """Diagnosticar problemas con la base de datos"""
@@ -39,11 +38,11 @@ def diagnosticar_bd():
                     conn.close()
                     print(f"   ✅ {archivo}: Conexión exitosa")
                     print(f"   📊 Tablas: {[tabla[0] for tabla in tablas]}")
-                except Exception as e:
+                except (sqlite3.Error, OSError) as e:
                     print(f"   ❌ {archivo}: Error al conectar - {e}")
     
     # Probar la configuración de Flask
-    print(f"\n🧪 PROBANDO CONFIGURACIÓN DE FLASK")
+    print("\n🧪 PROBANDO CONFIGURACIÓN DE FLASK")
     print("=" * 40)
     
     try:
@@ -72,11 +71,11 @@ def diagnosticar_bd():
                 print(f"📖 Lectura: {os.access(db_path, os.R_OK)}")
                 print(f"✏️  Escritura: {os.access(db_path, os.W_OK)}")
             
-    except Exception as e:
+    except (ImportError, AttributeError) as e:
         print(f"❌ Error al probar configuración: {e}")
     
     # Probar conexión directa con SQLAlchemy
-    print(f"\n🔗 PROBANDO SQLALCHEMY")
+    print("\n🔗 PROBANDO SQLALCHEMY")
     print("=" * 30)
     
     try:
@@ -88,11 +87,11 @@ def diagnosticar_bd():
         
         engine = create_engine(config_obj.SQLALCHEMY_DATABASE_URI)
         connection = engine.connect()
-        result = connection.execute("SELECT 1")
+        connection.execute("SELECT 1")  # Test query, result not needed
         connection.close()
         print("✅ Conexión SQLAlchemy: OK")
         
-    except Exception as e:
+    except (ImportError, AttributeError, ValueError) as e:
         print(f"❌ Error SQLAlchemy: {e}")
 
 if __name__ == "__main__":

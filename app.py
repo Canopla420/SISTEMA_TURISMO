@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
-import sys
 
-# Configurar codificación UTF-8
+# Forzar UTF-8 y locale en Windows
+import sys
 if sys.platform.startswith('win'):
+    import os
     os.environ['PYTHONIOENCODING'] = 'utf-8'
+    os.environ['LC_ALL'] = 'es_AR.UTF-8'
+    os.environ['LANG'] = 'es_AR.UTF-8'
 
 from flask import Flask, request, jsonify, render_template, redirect, url_for, send_file
 from flask_mail import Mail
@@ -159,24 +161,22 @@ def cargar_datos_iniciales():
         empresas_count = EmpresaTuristica.query.count()
         if empresas_count > 0:
             return f"✅ Ya hay {empresas_count} empresas en la base de datos. No es necesario cargar datos."
-        
-        # Crear datos de ejemplo
         empresas_data = [
             {
-                'nombre': 'Museo Histórico de la Colonización Esperanza',
-                'descripcion': 'Museo que preserva la historia de la colonización suiza-alemana',
-                'direccion': 'Av. San Martín 402',
-                'telefono': '(03496) 420-789',
+                'nombre': 'Museo Historico',
+                'descripcion': 'Museo que preserva la historia local',
+                'direccion': 'Av. San Martin 402',
+                'telefono': '03496-420789',
                 'email': 'museo@esperanza.gov.ar',
                 'categoria': 'Turismo de Identidad',
                 'capacidad_maxima': 40,
                 'duracion_visita': '90 minutos'
             },
             {
-                'nombre': 'Centro Cultural Municipal Casa Diefenbach',
-                'descripcion': 'Centro cultural en edificio histórico de 1920',
+                'nombre': 'Centro Cultural Casa Diefenbach',
+                'descripcion': 'Centro cultural en edificio historico',
                 'direccion': 'Calle 25 de Mayo 356',
-                'telefono': '(03496) 420-123',
+                'telefono': '03496-420123',
                 'email': 'cultura@esperanza.gov.ar',
                 'categoria': 'Turismo de Identidad',
                 'capacidad_maxima': 60,
@@ -184,33 +184,13 @@ def cargar_datos_iniciales():
             },
             {
                 'nombre': 'Iglesia San Pedro',
-                'descripcion': 'Primera iglesia de la colonia suiza, construida en 1862',
-                'direccion': 'Plaza San Martín s/n',
-                'telefono': '(03496) 420-456',
+                'descripcion': 'Primera iglesia de la colonia suiza',
+                'direccion': 'Plaza San Martin',
+                'telefono': '03496-420456',
                 'email': 'sanpedro@esperanza.gov.ar',
                 'categoria': 'Turismo de Identidad',
                 'capacidad_maxima': 80,
                 'duracion_visita': '60 minutos'
-            },
-            {
-                'nombre': 'Granja Educativa Los Aromos',
-                'descripcion': 'Experiencia educativa en granja con animales de granja',
-                'direccion': 'Ruta Provincial 70 Km 8',
-                'telefono': '(03496) 421-555',
-                'email': 'info@granjalosaromos.com',
-                'categoria': 'Turismo Educativo',
-                'capacidad_maxima': 50,
-                'duracion_visita': '3 horas'
-            },
-            {
-                'nombre': 'Reserva Natural Municipal',
-                'descripcion': 'Reserva natural con senderos interpretativos y fauna nativa',
-                'direccion': 'Camino Rural al Río Salado',
-                'telefono': '(03496) 421-777',
-                'email': 'reserva@esperanza.gov.ar',
-                'categoria': 'Turismo Educativo',
-                'capacidad_maxima': 35,
-                'duracion_visita': '2.5 horas'
             }
         ]
         
@@ -656,33 +636,28 @@ def agregar_empresa():
     """Agregar una nueva empresa"""
     if request.method == 'POST':
         try:
-            costo_str = request.form.get('costo_por_persona')
-            costo = float(costo_str) if costo_str and costo_str.strip() else None
-            
-            capacidad_str = request.form.get('capacidad_maxima')
-            capacidad = int(capacidad_str) if capacidad_str and capacidad_str.strip() else None
-            
+            # Solo tomar los campos válidos del modelo
             empresa = EmpresaTuristica(
                 nombre=request.form.get('nombre'),
-                correo=request.form.get('correo'),
-                telefono=request.form.get('telefono'),
-                direccion=request.form.get('direccion'),
-                servicios_ofrecidos=request.form.get('servicios_ofrecidos'),
                 descripcion=request.form.get('descripcion'),
-                categoria_turismo=request.form.get('categoria_turismo'),  # 'identidad' o 'educativo'
-                nivel_educativo_objetivo=request.form.get('nivel_educativo_objetivo'),  # 'Primario', 'Secundario', 'Ambos'
-                capacidad_maxima=capacidad,
-                horarios_atencion=request.form.get('horarios_atencion'),
-                costo_por_persona=costo,
-                requiere_reserva=bool(request.form.get('requiere_reserva'))
+                direccion=request.form.get('direccion'),
+                telefono=request.form.get('telefono'),
+                email=request.form.get('correo'),
+                categoria=request.form.get('categoria_turismo'),
+                capacidad_maxima=int(request.form.get('capacidad_maxima', 0)) if request.form.get('capacidad_maxima') else None,
+                duracion_visita=request.form.get('duracion_visita')
             )
             db.session.add(empresa)
             db.session.commit()
             return redirect(url_for('gestionar_empresas'))
-        except (ValueError, TypeError, OSError) as e:
+        except Exception as e:
             db.session.rollback()
+            import traceback
             print(f"Error al agregar empresa: {e}")
-            return "Error al agregar empresa", 500
+            print(traceback.format_exc())
+            # Mostrar los datos recibidos para depuración
+            datos = {k: v for k, v in request.form.items()}
+            return f"Error al agregar empresa: {e}<br>Datos recibidos: {datos}", 500
     
     return render_template('agregar_empresa.html')
 
@@ -758,20 +733,7 @@ def crear_itinerario():
             # Título principal
             p.setFont("Helvetica-Bold", 20)
             p.setFillColorRGB(0.1, 0.2, 0.4)
-            p.drawCentredString(width / 2, height - top_margin - 30, "Itinerario de Visita")
-
-            # Línea separadora
-            p.setStrokeColorRGB(0.1, 0.2, 0.4)
-            p.setLineWidth(2)
-            p.line(left_margin, height - top_margin - 40, width - right_margin, height - top_margin - 40)
-
-            # Subtítulo
-            p.setFont("Helvetica-Bold", 14)
-            p.setFillColorRGB(0.2, 0.2, 0.2)
-            p.drawString(left_margin, height - top_margin - 70, "Datos de la Institución:")
-
-            # Datos de la visita
-            p.setFont("Helvetica", 12)
+            # (Eliminado bloque incorrecto de creación de empresa)
             p.setFillColorRGB(0, 0, 0)
             y = height - top_margin - 100
             line_space = 20

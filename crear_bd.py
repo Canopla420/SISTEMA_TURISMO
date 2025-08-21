@@ -3,7 +3,6 @@ Script para crear la base de datos con la nueva estructura
 """
 import os
 import sys
-from datetime import datetime
 
 # Agregar el directorio del proyecto al path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -27,7 +26,7 @@ def crear_base_datos():
             for tabla in tablas:
                 print(f"   - {tabla}")
                 
-        except Exception as e:
+        except (ValueError, TypeError, OSError) as e:
             print(f"❌ Error al crear la base de datos: {e}")
             return False
     
@@ -35,7 +34,7 @@ def crear_base_datos():
 
 def agregar_datos_ejemplo():
     """Agregar algunos datos de ejemplo para probar el sistema"""
-    from app import EmpresaTuristica, SolicitudVisita
+    from app import EmpresaTuristica
     
     with app.app_context():
         try:
@@ -97,7 +96,7 @@ def agregar_datos_ejemplo():
             print("✅ Datos de ejemplo agregados exitosamente")
             print(f"📊 Se agregaron {len(empresas_ejemplo)} empresas de ejemplo")
             
-        except Exception as e:
+        except (ValueError, TypeError, OSError) as e:
             db.session.rollback()
             print(f"❌ Error al agregar datos de ejemplo: {e}")
             return False

@@ -1,56 +1,300 @@
-# Sistema de Gestión de Visitas Turísticas
+# 🏛️ Sistema de Gestión de Visitas Turísticas - Esperanza
 
-Sistema web desarrollado en Flask para gestionar visitas de instituciones educativas a empresas turísticas.
+Sistema web desarrollado en Flask para gestionar visitas de instituciones educativas a empresas turísticas en la ciudad de Esperanza, Santa Fe.
 
-## Tecnologías utilizadas
+## 🎯 Funcionalidades Principales
+
+### 🏢 **Gestión de Empresas Turísticas (CRUD)**
+
+- Crear, editar, consultar y desactivar empresas
+- Categorización automática por tipo de turismo
+- Sistema de filtrado dinámico
+
+### 📋 **Gestión de Solicitudes de Visitas**
+
+- Formulario de solicitud para instituciones
+- Filtrado automático de empresas según origen y nivel educativo
+- Estados: Pendiente, Confirmada, Realizada, Cancelada
+
+### 🔍 **Sistema de Filtrado Inteligente**
+
+- **Turismo de Identidad**: Para instituciones DE Esperanza
+- **Turismo Educativo**: Para instituciones EXTERNAS
+- Filtrado por nivel educativo (Primario, Secundario, Ambos)
+
+### 📧 **Consultas a Empresas**
+
+- Envío de consultas por email a empresas
+- Gestión de disponibilidad y capacidad
+
+### 📄 **Generación de Itinerarios PDF**
+
+- Creación automática de itinerarios
+- Información completa de visitas
+- Compartible con instituciones y empresas
+
+## 💻 Tecnologías Utilizadas
 
 - **Backend**: Flask (Python)
-- **Base de datos**: PostgreSQL
-- **Frontend**: HTML, CSS, JavaScript
+- **Base de datos**: PostgreSQL con Docker
+- **Frontend**: HTML5, CSS3, JavaScript
 - **PDF**: ReportLab
 - **Email**: Flask-Mail
+- **Contenedores**: Docker & Docker Compose
 
-## Configuración de PostgreSQL
+## 🚀 Instalación y Configuración
 
-### 1. Instalar PostgreSQL
-- Descarga e instala PostgreSQL desde: https://www.postgresql.org/download/
-- Durante la instalación, anota el puerto (por defecto 5432) y la contraseña del usuario `postgres`
+### 1. Requisitos Previos
 
-### 2. Crear la base de datos
-```sql
--- Conectarse a PostgreSQL como superusuario
-psql -U postgres
+- Python 3.8+
+- Docker Desktop
+- Git
 
--- Crear la base de datos
-CREATE DATABASE sistema_turismo;
+### 2. Clonar el Repositorio
 
--- Crear un usuario específico (opcional)
-CREATE USER turismo_user WITH PASSWORD 'tu_password';
-GRANT ALL PRIVILEGES ON DATABASE sistema_turismo TO turismo_user;
-
--- Salir de PostgreSQL
-\q
+```bash
+git clone https://github.com/Canopla420/SISTEMA_TURISMO.git
+cd SISTEMA_TURISMO
 ```
 
-### 3. Configurar VS Code para PostgreSQL
+### 3. Crear Entorno Virtual
 
-#### Opción 1: Usar extensión SQLTools
-1. Instalar extensión "SQLTools" en VS Code
-2. Instalar "SQLTools PostgreSQL/Cockroach Driver"
-3. Crear nueva conexión:
-   - Host: localhost
-   - Port: 5432
-   - Database: sistema_turismo
-   - Username: postgres (o tu usuario)
-   - Password: tu_password
+```bash
+python -m venv venv_nuevo
+# En Windows:
+venv_nuevo\Scripts\activate
+# En Linux/Mac:
+source venv_nuevo/bin/activate
+```
+
+### 4. Configuración Automática
+
+```bash
+python configurar_sistema.py
+```
+
+Este script automáticamente:
+
+- ✅ Verifica Docker
+- ✅ Inicia PostgreSQL y Adminer
+- ✅ Instala dependencias Python
+- ✅ Crea estructura de base de datos
+- ✅ Puebla con datos de ejemplo
+
+### 5. Ejecutar la Aplicación
+
+```bash
+python app.py
+```
+
+## 🔗 Accesos del Sistema
+
+- **🖥️ Aplicación Web**: http://localhost:5000
+- **🗄️ Administrador BD (Adminer)**: http://localhost:8080
+- **📊 pgAdmin** (opcional): http://localhost:5050
+
+### Credenciales de Base de Datos:
+
+- **Host**: localhost:5432
+- **Database**: turismo_esperanza
+- **User**: admin_turismo
+- **Password**: TurismoEsperanza2024!
+
+## 📁 Estructura del Proyecto
+
+```
+SISTEMA_TURISMO/
+├── app.py                    # Aplicación principal Flask
+├── config.py                 # Configuración de la aplicación
+├── configurar_sistema.py     # Script de configuración automática
+├── requirements.txt          # Dependencias Python
+├── docker-compose.yml        # Configuración Docker
+├── .env                      # Variables de entorno
+├── instance/                 # Archivos de instancia
+├── Templates/                # Plantillas HTML
+│   ├── index.html           # Página principal
+│   ├── nueva_visita.html    # Formulario de solicitud
+│   ├── consultar_visitas.html # Gestión de visitas
+│   ├── gestionar_empresas.html # CRUD empresas
+│   └── ...
+├── static/                   # Archivos estáticos
+│   ├── css/                 # Estilos CSS
+│   └── js/                  # JavaScript
+└── migrations/              # Migraciones de BD
+```
+
+## 🎪 Rutas Principales
+
+### 📋 **Gestión de Visitas**
+
+- `/` - Página principal
+- `/nueva_visita` - Formulario de nueva solicitud
+- `/consultar_visitas` - Ver y gestionar visitas
+- `/modificar_visita/<id>` - Editar solicitud
+- `/confirmar_visita/<id>` - Confirmar visita
+- `/crear_itinerario` - Generar PDF de itinerario
+
+### 🏢 **Gestión de Empresas**
+
+- `/gestionar_empresas` - Dashboard CRUD de empresas
+- `/agregar_empresa` - Crear nueva empresa
+- `/editar_empresa/<id>` - Editar empresa
+- `/consultar_empresas` - Búsqueda y consultas
+
+### 🔌 **API Endpoints**
+
+- `/empresas_filtradas` - Filtrado dinámico
+- `/todas_empresas` - Lista JSON de empresas
+- `/enviar_consulta` - Procesar consultas
+
+## 🎯 Sistema de Categorización
+
+### 🏛️ **TURISMO DE IDENTIDAD** (Instituciones Locales)
+
+Para estudiantes DE Esperanza que quieren conocer su ciudad:
+
+**Nivel Primario:**
+
+- Museo Histórico de la Colonización
+- Centro Cultural Municipal
+- Espacios patrimoniales locales
+
+**Nivel Secundario:**
+
+- Cooperativa Agrícola Local
+- Industrias Lácteas
+- Empresas de producción local
+
+### 🎓 **TURISMO EDUCATIVO** (Instituciones Externas)
+
+Para estudiantes de OTRAS ciudades:
+
+**Nivel Primario:**
+
+- Granjas educativas
+- Centros de naturaleza
+- Actividades rurales
+
+**Nivel Secundario:**
+
+- Centros tecnológicos
+- Industrias especializadas
+- Innovación y ciencia
+
+## 🛠️ Comandos Útiles
+
+### Docker
+
+```bash
+# Iniciar servicios
+docker compose up -d
+
+# Parar servicios
+docker compose down
+
+# Ver logs
+docker compose logs postgres_turismo
+
+# Reiniciar
+docker compose restart
+```
+
+### Base de Datos
+
+```bash
+# Crear migración
+flask db migrate -m "Descripción"
+
+# Aplicar migraciones
+flask db upgrade
+
+# Conectar a PostgreSQL
+docker exec -it postgres_turismo psql -U admin_turismo turismo_esperanza
+```
+
+## 🔧 Configuración Avanzada
+
+### Variables de Entorno (.env)
+
+```env
+DATABASE_URL=postgresql://admin_turismo:TurismoEsperanza2024!@localhost:5432/turismo_esperanza
+SECRET_KEY=clave_secreta_segura
+FLASK_ENV=development
+FLASK_DEBUG=True
+```
+
+### Email (Opcional)
+
+```env
+MAIL_SERVER=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USE_TLS=True
+MAIL_USERNAME=tu_email@gmail.com
+MAIL_PASSWORD=tu_app_password
+```
+
+## 🆘 Solución de Problemas
+
+### Error de Docker
+
+```bash
+# Verificar que Docker esté ejecutándose
+docker --version
+docker compose version
+
+# Reiniciar Docker Desktop si es necesario
+```
+
+### Error de Base de Datos
+
+```bash
+# Resetear base de datos
+docker compose down -v
+python configurar_sistema.py
+```
+
+### Error de Dependencias
+
+```bash
+# Reinstalar dependencias
+pip install -r requirements.txt --force-reinstall
+```
+
+## 🤝 Contribuir
+
+1. Fork el proyecto
+2. Crea una rama feature (`git checkout -b feature/nueva-funcionalidad`)
+3. Commit tus cambios (`git commit -am 'Agregar nueva funcionalidad'`)
+4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
+5. Abre un Pull Request
+
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia MIT. Ver `LICENSE` para más detalles.
+
+## 👨‍💻 Autor
+
+**Canopla420** - [GitHub](https://github.com/Canopla420)
+
+---
+
+_Sistema desarrollado para la Dirección de Turismo de la Ciudad de Esperanza, Santa Fe_ 2. Instalar "SQLTools PostgreSQL/Cockroach Driver" 3. Crear nueva conexión:
+
+- Host: localhost
+- Port: 5432
+- Database: sistema_turismo
+- Username: postgres (o tu usuario)
+- Password: tu_password
 
 #### Opción 2: Usar extensión PostgreSQL
+
 1. Instalar extensión "PostgreSQL" (ckolkman.vscode-postgres)
 2. Configurar conexión con tus credenciales
 
 ## Instalación del proyecto
 
 ### 1. Instalar dependencias
+
 ```bash
 # Instalar psycopg2 para PostgreSQL
 pip install psycopg2-binary
@@ -60,6 +304,7 @@ pip install -r requirements.txt
 ```
 
 ### 2. Configurar variables de entorno
+
 ```bash
 # Copiar el archivo de ejemplo
 copy .env.example .env
@@ -71,6 +316,7 @@ copy .env.example .env
 ```
 
 ### 3. Inicializar la base de datos
+
 ```bash
 # Inicializar migraciones (solo la primera vez)
 flask db init
@@ -86,6 +332,7 @@ python init_db.py
 ```
 
 ### 4. Ejecutar la aplicación
+
 ```bash
 python app.py
 ```
@@ -93,6 +340,7 @@ python app.py
 ## Estructura de la base de datos
 
 ### Tablas principales:
+
 - **solicitudes_visita**: Solicitudes de visitas de instituciones
 - **empresas_turisticas**: Empresas que reciben las visitas
 - **visitas_realizadas**: Historial de visitas completadas
@@ -105,27 +353,33 @@ python app.py
 El sistema está diseñado para manejar dos tipos principales de turismo educativo:
 
 ### 🏛️ **NUESTRA IDENTIDAD (Esperanza)**
+
 **Para instituciones DE Esperanza que quieren conocer su ciudad**
 
 #### Nivel Primario:
+
 - Museo Histórico de Esperanza
 - Centro Cultural Municipal
 - Espacios patrimoniales locales
 
-#### Nivel Secundario:  
+#### Nivel Secundario:
+
 - Cooperativa Agrícola Local
 - Industria Láctea Esperanza
 - Empresas locales de producción
 
 ### 🌟 **TURISMO EDUCATIVO (Externas)**
+
 **Para instituciones de AFUERA que visitan la región**
 
 #### Nivel Primario:
+
 - Granja Educativa Los Arrayanes
 - Acuario del Río Paraná
 - Experiencias rurales y de naturaleza
 
 #### Nivel Secundario:
+
 - Planetario de Santa Fe
 - Centro de Innovación Tecnológica
 - Parque Nacional Los Palmares
@@ -141,12 +395,14 @@ El sistema está diseñado para manejar dos tipos principales de turismo educati
    - `nivel_educativo_objetivo`: 'Primario', 'Secundario', 'Ambos'
 
 ### Para instituciones:
+
 - ✅ Solicitar visitas a empresas turísticas
 - ✅ Seleccionar múltiples empresas
 - ✅ Especificar fechas y horarios
 - ✅ Detallar información del grupo
 
 ### Para administradores:
+
 - ✅ Gestionar empresas turísticas (CRUD)
 - ✅ Consultar y modificar solicitudes
 - ✅ Confirmar/rechazar visitas
@@ -157,6 +413,7 @@ El sistema está diseñado para manejar dos tipos principales de turismo educati
 ## Comandos útiles
 
 ### Migraciones
+
 ```bash
 # Crear nueva migración después de cambios en modelos
 flask db migrate -m "Descripción del cambio"
@@ -172,6 +429,7 @@ flask db downgrade
 ```
 
 ### Base de datos
+
 ```bash
 # Conectarse directamente a PostgreSQL
 psql -U postgres -d sistema_turismo
@@ -194,36 +452,41 @@ psql -U postgres sistema_turismo < backup.sql
 
 ## Notas importantes
 
-1. **Tipos de datos mejorados**: 
-   - Fechas como `Date` en lugar de strings
-   - Horas como `Time` en lugar de strings
-   - Precios como `Numeric` para mayor precisión
+1.  **Tipos de datos mejorados**:
 
-2. **Relaciones entre tablas**: 
-   - Las visitas están relacionadas con empresas
-   - Se mantiene historial completo
-   - Soft delete para empresas (no se eliminan, se desactivan)
+    - Fechas como `Date` en lugar de strings
+    - Horas como `Time` en lugar de strings
+    - Precios como `Numeric` para mayor precisión
 
-3. **Manejo de errores**: 
-   - Try-catch en operaciones críticas
-   - Rollback automático en caso de errores
-   - Logging de errores para debugging
-   
-4. **Configuración flexible**: 
-   - Variables de entorno para credenciales
-   - Configuraciones separadas para desarrollo/producción
-   - Fácil cambio entre entornos
-  
+2.  **Relaciones entre tablas**:
 
-     # 1. Clonar el repositorio
-git clone https://github.com/Canopla420/SISTEMA_TURISMO.git
-cd SISTEMA_TURISMO
+    - Las visitas están relacionadas con empresas
+    - Se mantiene historial completo
+    - Soft delete para empresas (no se eliminan, se desactivan)
+
+3.  **Manejo de errores**:
+    - Try-catch en operaciones críticas
+    - Rollback automático en caso de errores
+    - Logging de errores para debugging
+4.  **Configuración flexible**:
+
+    - Variables de entorno para credenciales
+    - Configuraciones separadas para desarrollo/producción
+    - Fácil cambio entre entornos
+
+           # 1. Clonar el repositorio
+
+      git clone https://github.com/Canopla420/SISTEMA_TURISMO.git
+      cd SISTEMA_TURISMO
 
 # 2. Instalar dependencias
+
 pip install -r requirements.txt
 
 # 3. Configurar base de datos
+
 flask db upgrade
 
 # 4. Ejecutar
+
 python app.py
