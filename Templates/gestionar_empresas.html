@@ -18,16 +18,12 @@
             <h2>📊 Resumen del Sistema</h2>
             <div class="estadisticas-grid">
                 <div class="stat-card identidad">
-                    <div class="stat-number">{{ empresas|selectattr('categoria_turismo', 'equalto', 'identidad')|list|length }}</div>
+                    <div class="stat-number">{{ empresas|selectattr('categoria', 'equalto', 'identidad')|list|length }}</div>
                     <div class="stat-label">Turismo de Identidad</div>
                 </div>
                 <div class="stat-card educativo">
-                    <div class="stat-number">{{ empresas|selectattr('categoria_turismo', 'equalto', 'educativo')|list|length }}</div>
+                    <div class="stat-number">{{ empresas|selectattr('categoria', 'equalto', 'educativo')|list|length }}</div>
                     <div class="stat-label">Turismo Educativo</div>
-                </div>
-                <div class="stat-card activas">
-                    <div class="stat-number">{{ empresas|selectattr('activa', 'equalto', true)|list|length }}</div>
-                    <div class="stat-label">Empresas Activas</div>
                 </div>
                 <div class="stat-card total">
                     <div class="stat-number">{{ empresas|length }}</div>
@@ -58,17 +54,16 @@
                         <tr>
                             <th>ID</th>
                             <th>🏢 Empresa</th>
-                            <th>📧 Contacto</th>
+                            <th>📧 Email</th>
+                            <th>📞 Teléfono</th>
                             <th>🎯 Categoría</th>
-                            <th>🎓 Nivel Educativo</th>
-                            <th>📊 Estado</th>
                             <th>⚙️ Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% if empresas|length == 0 %}
                         <tr>
-                            <td colspan="7" class="sin-datos">
+                            <td colspan="6" class="sin-datos">
                                 <div class="mensaje-vacio">
                                     <h3>📭 No hay empresas registradas</h3>
                                     <p>Comience agregando la primera empresa turística al sistema.</p>
@@ -78,7 +73,7 @@
                         </tr>
                         {% else %}
                         {% for empresa in empresas %}
-                        <tr class="{{ 'fila-inactiva' if not empresa.activa }}">
+                        <tr>
                             <td class="id-celda">#{{ empresa.id }}</td>
                             <td class="empresa-celda">
                                 <div class="empresa-info">
@@ -88,55 +83,33 @@
                                     {% endif %}
                                 </div>
                             </td>
-                            <td class="contacto-celda">
-                                <div class="contacto-info">
-                                    <span>{{ empresa.correo }}</span>
-                                    {% if empresa.telefono %}
-                                    <small>📞 {{ empresa.telefono }}</small>
-                                    {% endif %}
-                                </div>
-                            </td>
+                            <td class="email-celda">{{ empresa.email or '' }}</td>
+                            <td class="telefono-celda">{{ empresa.telefono or 'No especificado' }}</td>
                             <td class="categoria-celda">
-                                <span class="categoria-badge {{ empresa.categoria_turismo }}">
-                                    {% if empresa.categoria_turismo == 'identidad' %}
+                                <span class="categoria-badge {{ empresa.categoria }}">
+                                    {% if empresa.categoria == 'identidad' %}
                                     🏛️ Identidad
                                     {% else %}
                                     🎓 Educativo
                                     {% endif %}
                                 </span>
                             </td>
-                            <td class="nivel-celda">
-                                <span class="nivel-badge">{{ empresa.nivel_educativo_objetivo }}</span>
-                            </td>
-                            <td class="estado-celda">
-                                <span class="estado-badge {{ 'activa' if empresa.activa else 'inactiva' }}">
-                                    {% if empresa.activa %}
-                                    ✅ Activa
-                                    {% else %}
-                                    ❌ Inactiva
-                                    {% endif %}
-                                </span>
-                            </td>
                             <td class="acciones-celda">
                                 <div class="acciones-grupo">
-                                    <a href="{{ url_for('editar_empresa', id=empresa.id) }}" 
+                                    <a href="{{ url_for('editar_empresa', empresa_id=empresa.id) }}" 
                                        class="boton-accion editar" 
                                        title="Editar empresa">
                                         ✏️ Editar
                                     </a>
-                                    {% if empresa.activa %}
-                                    <form method="POST" action="{{ url_for('eliminar_empresa', id=empresa.id) }}" 
+                                    <form method="POST" action="{{ url_for('eliminar_empresa', empresa_id=empresa.id) }}" 
                                           style="display: inline;" 
-                                          onsubmit="return confirm('¿Está seguro de desactivar la empresa {{ empresa.nombre }}?')">
+                                          onsubmit="return confirm('¿Está seguro de eliminar la empresa {{ empresa.nombre }}?')">
                                         <button type="submit" 
                                                 class="boton-accion eliminar" 
-                                                title="Desactivar empresa">
-                                            🚫 Desactivar
+                                                title="Eliminar empresa">
+                                            �️ Eliminar
                                         </button>
                                     </form>
-                                    {% else %}
-                                    <span class="texto-desactivada">Desactivada</span>
-                                    {% endif %}
                                 </div>
                             </td>
                         </tr>

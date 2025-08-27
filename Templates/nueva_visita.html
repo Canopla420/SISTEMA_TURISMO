@@ -130,9 +130,32 @@
             <!-- C. SELECCIÓN DE EMPRESAS A VISITAR -->
             <div class="section">
                 <h2>C. Selección de Empresas a Visitar</h2>
-                <p id="cargando-empresas">Seleccione el tipo de institución y nivel educativo para ver las opciones disponibles.</p>
-                <div class="lugares-container" id="empresas-container">
-                    <!-- Las empresas se cargarán dinámicamente aquí -->
+                {% if empresas %}
+                    <p>📝 Seleccione las empresas que desea visitar:</p>
+                    <div class="lugares-container" id="empresas-container">
+                        {% for empresa in empresas %}
+                        <div class="lugar-item">
+                            <input type="checkbox" id="empresa_{{ empresa.id }}" name="empresas_seleccionadas" value="{{ empresa.id }}">
+                            <label for="empresa_{{ empresa.id }}" class="lugar-label">
+                                <div class="lugar-info">
+                                    <h4>🏢 {{ empresa.nombre }}</h4>
+                                    <p class="categoria">📂 {{ empresa.categoria }}</p>
+                                    <p class="contacto">📧 {{ empresa.email }}</p>
+                                    <p class="contacto">📞 {{ empresa.telefono }}</p>
+                                </div>
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="info-panel warning">
+                        <p>⚠️ No hay empresas registradas aún.</p>
+                        <p>Primero debe <a href="/gestionar_empresas" target="_blank">registrar empresas</a> para poder solicitar visitas.</p>
+                    </div>
+                {% endif %}
+                <div class="form-group">
+                    <label for="observaciones_empresas">Observaciones adicionales sobre las empresas seleccionadas:</label>
+                    <textarea id="observaciones_empresas" name="observaciones_empresas" rows="3" placeholder="Ej: Interés especial en el área de producción, horarios preferidos, etc."></textarea>
                 </div>
             </div>
 
@@ -306,7 +329,7 @@
     </style>
     
     <!-- Scripts JavaScript -->
-    <script src="{{ url_for('static', filename='js/filtro_empresas.js') }}"></script>
+    <!-- <script src="{{ url_for('static', filename='js/filtro_empresas.js') }}"></script> -->
     <script src="{{ url_for('static', filename='js/validaciones.js') }}"></script>
 </body>
 </html>

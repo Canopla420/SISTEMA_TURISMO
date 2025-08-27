@@ -1,138 +1,66 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
-Script de configuración para el Sistema de Gestión de Visitas Turísticas
-PostgreSQL + Docker
+Script para configurar base de datos SQLite local
+Sistema de Gestión de Visitas Turísticas - Esperanza
 """
 
-import subprocess
-import time
-from datetime import date, time as dt_time
+import os
+import sys
+from datetime import datetime, date, time
 
-def verificar_docker():
-    """Verifica que Docker esté instalado y funcionando"""
+def configurar_sqlite():
+    """Configura la base de datos SQLite y ejecuta la aplicación"""
+    print("🚀 CONFIGURANDO BASE DE DATOS SQLite LOCAL")
+    print("=" * 50)
+    
+    # 1. Crear directorio instance si no existe
+    print("📁 Creando directorio instance...")
+    instance_dir = 'instance'
+    if not os.path.exists(instance_dir):
+        os.makedirs(instance_dir)
+        print("   ✅ Directorio instance creado")
+    else:
+        print("   ℹ️  Directorio instance ya existe")
+    
+    # 2. Importar la aplicación
+    print("\n💾 Configurando base de datos...")
     try:
-        subprocess.run(['docker', '--version'], 
-                      capture_output=True, text=True, check=True)
-        print("✅ Docker instalado")
-        
-        subprocess.run(['docker', 'compose', 'version'], 
-                      capture_output=True, text=True, check=True)
-        print("✅ Docker Compose disponible")
-        return True
-    except (subprocess.CalledProcessError, FileNotFoundError):
-        print("❌ Docker no está instalado o no está disponible")
-        print("   Instala Docker Desktop desde: https://www.docker.com/products/docker-desktop")
-        return False
-
-def configurar_postgresql():
-    """Configura PostgreSQL con Docker"""
-    
-    print("🐘 CONFIGURANDO POSTGRESQL CON DOCKER")
-    print("=" * 60)
-    
-    # 1. Verificar Docker
-    if not verificar_docker():
-        return False
-    
-    # 2. Limpiar contenedores anteriores
-    print("\n🧹 Limpiando configuración anterior...")
-    try:
-        subprocess.run(['docker', 'compose', 'down', '-v'], 
-                      capture_output=True, check=False)
-        print("   ✅ Contenedores anteriores eliminados")
-    except (subprocess.CalledProcessError, FileNotFoundError):
-        print("   ℹ️ No había contenedores anteriores")
-    
-    # 3. Iniciar PostgreSQL
-    print("\n🚀 Iniciando PostgreSQL...")
-    try:
-        subprocess.run(['docker', 'compose', 'up', '-d', 'postgres_turismo'], 
-                      capture_output=True, text=True, check=True)
-        print("   ✅ PostgreSQL iniciado")
-        
-        # Esperar a que PostgreSQL esté listo
-        print("   ⏳ Esperando que PostgreSQL esté listo...")
-        time.sleep(10)
-        
-        # Iniciar Adminer
-        subprocess.run(['docker', 'compose', 'up', '-d', 'adminer'], 
-                      capture_output=True, text=True, check=True)
-        print("   ✅ Adminer iniciado")
-        
-    except subprocess.CalledProcessError as e:
-        print(f"   ❌ Error al iniciar contenedores: {e}")
-        return False
-    
-    # 4. Instalar dependencias Python
-    print("\n📦 Instalando dependencias Python...")
-    try:
-        subprocess.run(['pip', 'install', '-r', 'requirements.txt'], 
-                      capture_output=True, text=True, check=True)
-        print("   ✅ Dependencias instaladas")
-    except subprocess.CalledProcessError as e:
-        print(f"   ❌ Error instalando dependencias: {e}")
-        return False
-    
-    # 5. Crear estructura de base de datos
-    print("\n🏗️ Creando estructura de base de datos...")
-    try:
-        from app import app, db
+        from app import app, db, EmpresaTuristica, SolicitudVisita, Usuario
         
         with app.app_context():
             # Crear todas las tablas
             db.create_all()
-            print("   ✅ Tablas creadas")
+            print("   ✅ Tablas creadas exitosamente")
             
-            # Verificar tablas creadas
-            from sqlalchemy import inspect
-            inspector = inspect(db.engine)
-            tablas = inspector.get_table_names()
-            print(f"   📊 Tablas: {', '.join(tablas)}")
-            
-    except (ImportError, AttributeError, ValueError) as e:
-        print(f"   ❌ Error creando estructura: {e}")
+            # Verificar si ya hay datos
+            if EmpresaTuristica.query.count() > 0:
+                print("   ℹ️  Ya existen datos en la base de datos")
+            else:
+                print("   📋 Poblando con datos de ejemplo...")
+                poblar_datos_ejemplo()
+                
+    except Exception as e:
+        print(f"   ❌ Error al configurar BD: {e}")
         return False
     
-    # 6. Poblar con datos de ejemplo
-    print("\n📋 Poblando con datos de ejemplo...")
-    try:
-        poblar_datos_ejemplo()
-        print("   ✅ Datos de ejemplo creados")
-    except (ImportError, AttributeError, ValueError) as e:
-        print(f"   ❌ Error poblando datos: {e}")
-        return False
-    
-    print("\n🎉 SISTEMA CONFIGURADO EXITOSAMENTE!")
-    print("=" * 60)
-    print("✅ PostgreSQL ejecutándose en Docker")
-    print("✅ Base de datos creada y poblada")
-    print("✅ Sistema listo para usar")
-    
-    print("\n🔗 ACCESOS:")
-    print("   🖥️  Aplicación: http://localhost:5000")
-    print("   🗄️  Adminer: http://localhost:8080")
-    
-    print("\n🚀 PARA EJECUTAR EL SISTEMA:")
+    print("\n✅ CONFIGURACIÓN COMPLETADA")
+    print("🌐 Para ejecutar la aplicación:")
     print("   python app.py")
+    print("   Luego ve a: http://localhost:5000")
     
     return True
 
 def poblar_datos_ejemplo():
-    """Puebla la base de datos con datos de ejemplo"""
-    
-    from app import app, db, EmpresaTuristica, SolicitudVisita
+    """Pobla la base de datos con datos de ejemplo"""
+    from app import app, db, EmpresaTuristica, SolicitudVisita, Usuario
     
     with app.app_context():
-        # Verificar si ya hay datos
-        if EmpresaTuristica.query.count() > 0:
-            print("   ℹ️ Base de datos ya tiene datos")
-            return
-        
-        # EMPRESAS DE TURISMO DE IDENTIDAD (para instituciones locales)
+        # EMPRESAS DE TURISMO DE IDENTIDAD (locales)
         empresas_identidad = [
             EmpresaTuristica(
                 nombre='Museo Histórico de la Colonización Esperanza',
-                correo='educacion@museoesperanza.gov.ar',
+                correo='museo@esperanza.gov.ar',
                 telefono='+54 3496 421100',
                 direccion='Plaza San Martín 150, Esperanza, Santa Fe',
                 servicios_ofrecidos='Visitas guiadas especializadas, talleres de historia local, exhibiciones interactivas',
@@ -162,7 +90,7 @@ def poblar_datos_ejemplo():
             )
         ]
         
-        # EMPRESAS DE TURISMO EDUCATIVO (para instituciones externas)
+        # EMPRESAS DE TURISMO EDUCATIVO (externas)
         empresas_educativo = [
             EmpresaTuristica(
                 nombre='Granja Educativa "El Campo"',
@@ -218,7 +146,7 @@ def poblar_datos_ejemplo():
             discapacidad='No',
             empresas_seleccionadas='Museo Histórico de la Colonización Esperanza',
             fecha_visita=date(2025, 9, 15),
-            hora_grupo1=dt_time(9, 0),
+            hora_grupo1=time(9, 0),
             observaciones='Primera visita del año escolar',
             estado='Pendiente'
         )
@@ -226,8 +154,8 @@ def poblar_datos_ejemplo():
         db.session.add(solicitud_ejemplo)
         db.session.commit()
         
-        print(f"   📊 {len(empresas_identidad + empresas_educativo)} empresas creadas")
-        print("   📋 1 solicitud de ejemplo creada")
+        print(f"   ✅ {len(empresas_identidad + empresas_educativo)} empresas creadas")
+        print("   ✅ 1 solicitud de ejemplo creada")
 
 if __name__ == "__main__":
-    configurar_postgresql()
+    configurar_sqlite()

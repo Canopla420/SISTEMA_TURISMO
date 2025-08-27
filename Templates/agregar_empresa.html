@@ -33,8 +33,8 @@
                     <input type="text" id="nombre" name="nombre" required>
                 </div>
                 <div class="form-group">
-                    <label for="correo">Correo electrónico *:</label>
-                    <input type="email" id="correo" name="correo" required>
+                    <label for="email">Correo electrónico *:</label>
+                    <input type="email" id="email" name="email" required>
                 </div>
                 <div class="form-group">
                     <label for="telefono">Teléfono:</label>
@@ -51,7 +51,7 @@
                 <h2>Categorización</h2>
                 <div class="form-group">
                     <label for="categoria_turismo">Categoría de Turismo *:</label>
-                    <select id="categoria_turismo" name="categoria_turismo" required>
+                    <select id="categoria" name="categoria" required>
                         <option value="">Seleccione una categoría</option>
                         <option value="identidad">Turismo de Identidad (para instituciones locales)</option>
                         <option value="educativo">Turismo Educativo (para instituciones externas)</option>
@@ -82,13 +82,9 @@
                     <input type="number" id="capacidad_maxima" name="capacidad_maxima" min="1">
                 </div>
                 <div class="form-group">
-                    <!-- Campo eliminado: horarios_atencion -->
+                    <label for="duracion_visita">Duración estimada de la visita:</label>
+                    <input type="text" id="duracion_visita" name="duracion_visita" placeholder="Ej: 2 horas, 1 día, etc.">
                 </div>
-                <div class="form-group">
-                    <!-- Campo eliminado: costo_por_persona -->
-                </div>
-                <div class="form-group">
-                    <!-- Campo eliminado: requiere_reserva -->
             </div>
 
             <!-- Botones -->

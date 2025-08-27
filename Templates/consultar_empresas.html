@@ -27,14 +27,18 @@
         <!-- Formulario de consulta -->
         <div class="section">
             <h2>📋 Búsqueda de Empresa</h2>
-            <form action="/enviar_consulta" method="POST" class="form-solicitud">
+            <form id="consultaForm" action="/enviar_consulta" method="POST" class="form-solicitud">
                 <!-- Buscar empresa -->
                 <div class="form-group">
                     <label for="empresa">🏢 Empresa:</label>
                     <input type="text" id="empresa" name="empresa" list="lista_empresas" 
                            placeholder="Buscar empresa..." autocomplete="off">
                     <datalist id="lista_empresas">
-                        <!-- Se completa con JS -->
+                        {% for empresa in empresas %}
+                        <option value="{{ empresa.nombre }}" data-email="{{ empresa.email }}" data-id="{{ empresa.id }}">
+                            {{ empresa.nombre }} - {{ empresa.categoria }}
+                        </option>
+                        {% endfor %}
                     </datalist>
                 </div>
 
@@ -64,7 +68,7 @@
 
                 <!-- Botones -->
                 <div class="botones">
-                    <button type="submit" class="boton-enviar">
+                    <button type="submit" class="boton-enviar" id="btnEnviar">
                         📨 Enviar Consulta
                     </button>
                     <a href="{{ url_for('index') }}" class="boton-volver">
@@ -72,6 +76,11 @@
                     </a>
                 </div>
             </form>
+            
+            <!-- Mensaje de resultado -->
+            <div id="mensajeResultado" class="mensaje-resultado" style="display: none;">
+                <div id="contenidoMensaje"></div>
+            </div>
         </div>
 
         <!-- Información adicional -->
@@ -183,6 +192,50 @@
             box-shadow: 0 6px 20px rgba(108, 117, 125, 0.3);
         }
 
+        /* Mensajes de resultado */
+        .mensaje-resultado {
+            margin-top: 30px;
+            border-radius: 10px;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .mensaje-exito {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            border: 2px solid #28a745;
+            padding: 20px;
+            border-radius: 10px;
+            color: #155724;
+        }
+
+        .mensaje-exito h3 {
+            margin: 0 0 15px 0;
+            font-size: 1.3em;
+        }
+
+        .mensaje-exito p {
+            margin: 5px 0;
+            font-size: 1em;
+        }
+
+        .mensaje-error {
+            background: linear-gradient(135deg, #f8d7da, #f1b0b7);
+            border: 2px solid #dc3545;
+            padding: 20px;
+            border-radius: 10px;
+            color: #721c24;
+        }
+
+        .mensaje-error h3 {
+            margin: 0 0 15px 0;
+            font-size: 1.3em;
+        }
+
+        .mensaje-error p {
+            margin: 5px 0;
+            font-size: 1em;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .botones {
@@ -199,6 +252,127 @@
 
     <!-- Scripts JavaScript -->
     <script src="{{ url_for('static', filename='js/validaciones.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/consultar_empresa.js') }}"></script>
+    <script>
+        // JavaScript para autocompletar el correo cuando se selecciona una empresa
+        document.addEventListener('DOMContentLoaded', function() {
+            const empresaInput = document.getElementById('empresa');
+            const correoInput = document.getElementById('correo');
+            
+            // Datos de empresas desde el servidor
+            const empresas = [
+                {% for empresa in empresas %}
+                {
+                    nombre: "{{ empresa.nombre }}",
+                    email: "{{ empresa.email }}",
+                    id: {{ empresa.id }}
+                }{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ];
+            
+            // Función para buscar empresa por nombre
+            function buscarEmpresaPorNombre(nombre) {
+                return empresas.find(empresa => empresa.nombre === nombre);
+            }
+            
+            // Event listener para cuando cambia el valor del input de empresa
+            empresaInput.addEventListener('input', function() {
+                const nombreEmpresa = this.value;
+                const empresa = buscarEmpresaPorNombre(nombreEmpresa);
+                
+                if (empresa) {
+                    correoInput.value = empresa.email;
+                    correoInput.style.backgroundColor = '#e8f5e8';
+                } else {
+                    correoInput.value = '';
+                    correoInput.style.backgroundColor = '';
+                }
+            });
+            
+            // Event listener para cuando se selecciona una opción del datalist
+            empresaInput.addEventListener('change', function() {
+                const nombreEmpresa = this.value;
+                const empresa = buscarEmpresaPorNombre(nombreEmpresa);
+                
+                if (empresa) {
+                    correoInput.value = empresa.email;
+                    correoInput.style.backgroundColor = '#e8f5e8';
+                    console.log('Empresa seleccionada:', empresa.nombre, '- Email:', empresa.email);
+                }
+            });
+            
+            console.log('Sistema de autocompletado cargado. Empresas disponibles:', empresas.length);
+            
+            // Manejar el envío del formulario
+            const consultaForm = document.getElementById('consultaForm');
+            const btnEnviar = document.getElementById('btnEnviar');
+            const mensajeResultado = document.getElementById('mensajeResultado');
+            const contenidoMensaje = document.getElementById('contenidoMensaje');
+            
+            consultaForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Cambiar estado del botón
+                btnEnviar.disabled = true;
+                btnEnviar.innerHTML = '⏳ Enviando...';
+                
+                // Ocultar mensajes anteriores
+                mensajeResultado.style.display = 'none';
+                
+                // Crear FormData
+                const formData = new FormData(consultaForm);
+                
+                // Enviar la consulta
+                fetch('/enviar_consulta', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.mensaje) {
+                        // Éxito
+                        contenidoMensaje.innerHTML = `
+                            <div class="mensaje-exito">
+                                <h3>✅ Consulta Enviada Exitosamente</h3>
+                                <p><strong>Empresa:</strong> ${data.empresa}</p>
+                                <p><strong>Fecha:</strong> ${data.fecha}</p>
+                                <p><strong>Hora:</strong> ${data.hora}</p>
+                                <p><strong>Correo:</strong> ${data.correo}</p>
+                                <br>
+                                <p>📧 Se ha enviado un correo a la empresa consultando su disponibilidad.</p>
+                                <p>⏰ La empresa debería responder en un plazo de 24-48 horas.</p>
+                            </div>
+                        `;
+                        consultaForm.reset();
+                    } else if (data.error) {
+                        // Error
+                        contenidoMensaje.innerHTML = `
+                            <div class="mensaje-error">
+                                <h3>❌ Error al Enviar Consulta</h3>
+                                <p>${data.error}</p>
+                            </div>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    contenidoMensaje.innerHTML = `
+                        <div class="mensaje-error">
+                            <h3>❌ Error de Comunicación</h3>
+                            <p>No se pudo enviar la consulta. Por favor, inténtelo nuevamente.</p>
+                        </div>
+                    `;
+                })
+                .finally(() => {
+                    // Restaurar estado del botón
+                    btnEnviar.disabled = false;
+                    btnEnviar.innerHTML = '📨 Enviar Consulta';
+                    
+                    // Mostrar mensaje de resultado
+                    mensajeResultado.style.display = 'block';
+                    mensajeResultado.scrollIntoView({ behavior: 'smooth' });
+                });
+            });
+        });
+    </script>
 </body>
 </html>

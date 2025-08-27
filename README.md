@@ -33,21 +33,40 @@ Sistema web desarrollado en Flask para gestionar visitas de instituciones educat
 - Información completa de visitas
 - Compartible con instituciones y empresas
 
+## 📁 Organización del Proyecto
+
+El proyecto ha sido **reorganizado** siguiendo las mejores prácticas de desarrollo:
+
+### 🎯 **Estructura Limpia**
+- **Archivos principales** en la raíz (app.py, config.py, requirements.txt)
+- **Scripts organizados** por funcionalidad en `/scripts/`
+- **Documentación centralizada** en `/docs/`
+- **Scripts SQL separados** en `/sql/`
+
+### 🔧 **Scripts por Categoría**
+- **Setup**: Configuración e instalación (`/scripts/setup/`)
+- **Database**: Manejo de base de datos (`/scripts/database/`)  
+- **Testing**: Pruebas y diagnósticos (`/scripts/testing/`)
+
+### 💡 **Beneficios**
+- ✅ Fácil navegación y mantenimiento
+- ✅ Separación clara de responsabilidades
+- ✅ Escalabilidad para futuras funcionalidades
+- ✅ Mejor experiencia de desarrollo
+
 ## 💻 Tecnologías Utilizadas
 
 - **Backend**: Flask (Python)
-- **Base de datos**: PostgreSQL con Docker
+- **Base de datos**: SQLite (local, sin Docker)
 - **Frontend**: HTML5, CSS3, JavaScript
 - **PDF**: ReportLab
 - **Email**: Flask-Mail
-- **Contenedores**: Docker & Docker Compose
 
 ## 🚀 Instalación y Configuración
 
 ### 1. Requisitos Previos
 
 - Python 3.8+
-- Docker Desktop
 - Git
 
 ### 2. Clonar el Repositorio
@@ -69,28 +88,42 @@ source venv_nuevo/bin/activate
 
 ### 4. Configuración Automática
 
+**🎯 Método Recomendado** (un solo comando):
 ```bash
-python configurar_sistema.py
+python scripts/setup/configurar_sistema.py
 ```
 
-Este script automáticamente:
+**📁 Métodos alternativos**:
+```bash
+# Configuración específica SQLite
+python scripts/setup/configurar_sqlite.py
 
-- ✅ Verifica Docker
-- ✅ Inicia PostgreSQL y Adminer
+# Solo creación de BD robusta  
+python scripts/database/crear_bd_solida.py
+
+# Pruebas y diagnóstico
+python scripts/testing/test_db.py
+```
+
+La configuración automática:
+
+- ✅ Verifica Python 3.8+
 - ✅ Instala dependencias Python
-- ✅ Crea estructura de base de datos
+- ✅ Crea base de datos SQLite local
+- ✅ Crea estructura de tablas
 - ✅ Puebla con datos de ejemplo
 
 ### 5. Ejecutar la Aplicación
 
 ```bash
 python app.py
+# o también:
+python ejecutar.py
 ```
 
 ## 🔗 Accesos del Sistema
 
 - **🖥️ Aplicación Web**: http://localhost:5000
-- **🗄️ Administrador BD (Adminer)**: http://localhost:8080
 - **📊 pgAdmin** (opcional): http://localhost:5050
 
 ### Credenciales de Base de Datos:
@@ -104,23 +137,44 @@ python app.py
 
 ```
 SISTEMA_TURISMO/
-├── app.py                    # Aplicación principal Flask
-├── config.py                 # Configuración de la aplicación
-├── configurar_sistema.py     # Script de configuración automática
-├── requirements.txt          # Dependencias Python
-├── docker-compose.yml        # Configuración Docker
-├── .env                      # Variables de entorno
-├── instance/                 # Archivos de instancia
-├── Templates/                # Plantillas HTML
+├── app.py                    # 🚀 Aplicación principal Flask
+├── config.py                 # ⚙️ Configuración de la aplicación  
+├── requirements.txt          # 📦 Dependencias Python
+├── docker-compose.yml        # 🐳 Configuración Docker
+├── README.md                 # 📖 Documentación principal
+├── .env                      # 🔐 Variables de entorno
+├── 📁 scripts/               # 🔧 Scripts auxiliares organizados
+│   ├── setup/               # Scripts de configuración
+│   │   ├── configurar_sistema.py
+│   │   ├── setup_postgres.py
+│   │   └── configurar_postgresql.py
+│   ├── database/            # Scripts de base de datos
+│   │   ├── crear_bd.py
+│   │   ├── crear_bd_solida.py
+│   │   ├── crear_tablas.py
+│   │   └── cargar_datos_forzado.py
+│   └── testing/             # Scripts de pruebas
+│       ├── test_*.py
+│       ├── probar_*.py
+│       ├── diagnostico_*.py
+│       └── verificar_*.py
+├── 📁 sql/                   # 💾 Scripts SQL
+│   ├── crear_tablas.sql
+│   └── insertar_datos.sql
+├── 📁 docs/                  # 📖 Documentación técnica
+│   ├── CORRECCIONES_APLICADAS.md
+│   └── PROYECTO_LIMPIO.md
+├── 📁 templates/             # 🎨 Plantillas HTML
 │   ├── index.html           # Página principal
 │   ├── nueva_visita.html    # Formulario de solicitud
 │   ├── consultar_visitas.html # Gestión de visitas
 │   ├── gestionar_empresas.html # CRUD empresas
 │   └── ...
-├── static/                   # Archivos estáticos
+├── 📁 static/                # 🎨 Archivos estáticos
 │   ├── css/                 # Estilos CSS
 │   └── js/                  # JavaScript
-└── migrations/              # Migraciones de BD
+├── 📁 migrations/            # 🔄 Migraciones de BD
+└── 📁 instance/              # 💾 Base de datos local
 ```
 
 ## 🎪 Rutas Principales

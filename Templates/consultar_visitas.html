@@ -272,8 +272,8 @@
                                     {% endif %}
                                 </div>
                             </td>
-                            <td>{{ visita.correo_institucional }}</td>
-                            <td>{{ visita.telefono_institucion }}</td>
+                            <td>{{ visita.email }}</td>
+                            <td>{{ visita.telefono }}</td>
                             <td>{{ visita.fecha_visita }}</td>
                             <td class="personas">{{ visita.cantidad_alumnos }}</td>
                             <td>
@@ -293,24 +293,51 @@
                             <td>
                                 <div class="acciones-grupo">
                                     {% if visita.estado == 'Pendiente' %}
-                                    <form action="{{ url_for('confirmar_visita', id=visita.id) }}" method="POST" style="display:inline;">
+                                    <!-- Estado Pendiente: puede Confirmar o Rechazar -->
+                                    <form action="{{ url_for('confirmar_visita', visita_id=visita.id) }}" method="POST" style="display:inline;">
                                         <button type="submit" class="boton-accion confirmar" title="Confirmar visita">
                                             ✅ Confirmar
                                         </button>
                                     </form>
-                                    {% elif visita.estado == 'Confirmada' %}
-                                    <form action="{{ url_for('rechazar_visita', id=visita.id) }}" method="POST" style="display:inline;">
+                                    <form action="{{ url_for('rechazar_visita', visita_id=visita.id) }}" method="POST" style="display:inline;">
                                         <button type="submit" class="boton-accion rechazar" title="Rechazar visita"
                                                 onclick="return confirm('¿Está seguro de rechazar la visita de {{ visita.nombre_institucion }}?')">
                                             ❌ Rechazar
                                         </button>
                                     </form>
+                                    
+                                    {% elif visita.estado == 'Confirmada' %}
+                                    <!-- Estado Confirmada: puede volver a Pendiente o Rechazar -->
+                                    <form action="{{ url_for('pendiente_visita', visita_id=visita.id) }}" method="POST" style="display:inline;">
+                                        <button type="submit" class="boton-accion pendiente" title="Volver a Pendiente">
+                                            ⏳ Pendiente
+                                        </button>
+                                    </form>
+                                    <form action="{{ url_for('rechazar_visita', visita_id=visita.id) }}" method="POST" style="display:inline;">
+                                        <button type="submit" class="boton-accion rechazar" title="Rechazar visita"
+                                                onclick="return confirm('¿Está seguro de rechazar la visita de {{ visita.nombre_institucion }}?')">
+                                            ❌ Rechazar
+                                        </button>
+                                    </form>
+                                    
+                                    {% elif visita.estado == 'Rechazada' %}
+                                    <!-- Estado Rechazada: puede volver a Pendiente o Confirmar -->
+                                    <form action="{{ url_for('pendiente_visita', visita_id=visita.id) }}" method="POST" style="display:inline;">
+                                        <button type="submit" class="boton-accion pendiente" title="Volver a Pendiente">
+                                            ⏳ Pendiente
+                                        </button>
+                                    </form>
+                                    <form action="{{ url_for('confirmar_visita', visita_id=visita.id) }}" method="POST" style="display:inline;">
+                                        <button type="submit" class="boton-accion confirmar" title="Confirmar visita">
+                                            ✅ Confirmar
+                                        </button>
+                                    </form>
                                     {% endif %}
                                     
-                                    <a href="{{ url_for('modificar_visita', id=visita.id) }}" class="boton-accion editar">
+                                    <a href="{{ url_for('modificar_visita', visita_id=visita.id) }}" class="boton-accion editar">
                                         ✏️ Editar
                                     </a>
-                                    <form action="{{ url_for('eliminar_visita', id=visita.id) }}" method="POST" style="display:inline;">
+                                    <form action="{{ url_for('eliminar_visita', visita_id=visita.id) }}" method="POST" style="display:inline;">
                                         <button type="submit" class="boton-accion eliminar" title="Eliminar visita"
                                                 onclick="return confirm('¿Está seguro de eliminar definitivamente la visita de {{ visita.nombre_institucion }}?')">
                                             🗑️ Eliminar

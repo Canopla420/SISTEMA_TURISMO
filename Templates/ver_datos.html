@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Turismo - Datos Almacenados</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .section-header {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .section-header .count {
+            float: right;
+            background: rgba(255,255,255,0.2);
+            padding: 2px 8px;
+            border-radius: 15px;
+            font-size: 14px;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0;
+        }
+        
+        th {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            border-bottom: 2px solid #ddd;
+            font-weight: bold;
+            color: #2c3e50;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #eee;
+            vertical-align: top;
+        }
+        
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .empty-state {
+            padding: 40px;
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+        }
+        
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .status-pendiente {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-confirmada {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-rechazada {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .actions {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .btn {
+            background: #3498db;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 0 10px;
+            display: inline-block;
+            transition: background 0.3s;
+        }
+        
+        .btn:hover {
+            background: #2980b9;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .text-truncate {
+            max-width: 200px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .timestamp {
+            font-size: 12px;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏛️ Sistema de Turismo - Base de Datos</h1>
+        
+        <div class="actions">
+            <a href="/" class="btn">🏠 Volver al Inicio</a>
+            <a href="/ver_datos_json" class="btn btn-secondary">📊 Ver JSON</a>
+            <button onclick="location.reload()" class="btn btn-secondary">🔄 Actualizar</button>
+        </div>
+        
+        <!-- EMPRESAS TURÍSTICAS -->
+        <div class="section">
+            <div class="section-header">
+                🏢 Empresas Turísticas
+                <span class="count">{{ datos.empresas|length }} registros</span>
+            </div>
+            {% if datos.empresas %}
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Email</th>
+                                <th>Teléfono</th>
+                                <th>Categoría</th>
+                                <th>Fecha Creación</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for empresa in datos.empresas %}
+                            <tr>
+                                <td>{{ empresa.id }}</td>
+                                <td class="text-truncate" title="{{ empresa.nombre }}">{{ empresa.nombre }}</td>
+                                <td>{{ empresa.email }}</td>
+                                <td>{{ empresa.telefono }}</td>
+                                <td>{{ empresa.categoria }}</td>
+                                <td class="timestamp">
+                                    {% if empresa.fecha_creacion %}
+                                        {{ empresa.fecha_creacion.strftime('%d/%m/%Y %H:%M') }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    📭 No hay empresas registradas aún
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- SOLICITUDES DE VISITA -->
+        <div class="section">
+            <div class="section-header">
+                🎯 Solicitudes de Visita
+                <span class="count">{{ datos.visitas|length }} registros</span>
+            </div>
+            {% if datos.visitas %}
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Empresa</th>
+                                <th>Fecha Visita</th>
+                                <th>Hora</th>
+                                <th>Visitante</th>
+                                <th>Email</th>
+                                <th>Estado</th>
+                                <th>Creación</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for visita in datos.visitas %}
+                            <tr>
+                                <td>{{ visita.id }}</td>
+                                <td class="text-truncate" title="{{ visita.empresa.nombre if visita.empresa else 'Sin empresa' }}">
+                                    {{ visita.empresa.nombre if visita.empresa else 'Sin empresa' }}
+                                </td>
+                                <td>{{ visita.fecha_visita.strftime('%d/%m/%Y') if visita.fecha_visita else 'Sin fecha' }}</td>
+                                <td>{{ visita.hora_visita.strftime('%H:%M') if visita.hora_visita else 'Sin hora' }}</td>
+                                <td>{{ visita.nombre_visitante }}</td>
+                                <td>{{ visita.email_visitante }}</td>
+                                <td>
+                                    <span class="status-badge status-{{ visita.estado.lower() }}">
+                                        {{ visita.estado }}
+                                    </span>
+                                </td>
+                                <td class="timestamp">
+                                    {% if visita.fecha_creacion %}
+                                        {{ visita.fecha_creacion.strftime('%d/%m/%Y %H:%M') }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    📭 No hay solicitudes de visita registradas aún
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- CONSULTAS A EMPRESAS -->
+        <div class="section">
+            <div class="section-header">
+                📧 Consultas a Empresas
+                <span class="count">{{ datos.consultas|length }} registros</span>
+            </div>
+            {% if datos.consultas %}
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Empresa</th>
+                                <th>Fecha Consulta</th>
+                                <th>Hora</th>
+                                <th>Comentarios</th>
+                                <th>Estado</th>
+                                <th>Creación</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for consulta in datos.consultas %}
+                            <tr>
+                                <td>{{ consulta.id }}</td>
+                                <td class="text-truncate" title="{{ consulta.empresa.nombre if consulta.empresa else 'Sin empresa' }}">
+                                    {{ consulta.empresa.nombre if consulta.empresa else 'Sin empresa' }}
+                                </td>
+                                <td>{{ consulta.fecha_consulta.strftime('%d/%m/%Y') if consulta.fecha_consulta else 'Sin fecha' }}</td>
+                                <td>{{ consulta.hora_consulta.strftime('%H:%M') if consulta.hora_consulta else 'Sin hora' }}</td>
+                                <td class="text-truncate" title="{{ consulta.comentarios }}">
+                                    {{ consulta.comentarios or 'Sin comentarios' }}
+                                </td>
+                                <td>
+                                    <span class="status-badge status-{{ consulta.estado.lower() }}">
+                                        {{ consulta.estado }}
+                                    </span>
+                                </td>
+                                <td class="timestamp">
+                                    {% if consulta.fecha_creacion %}
+                                        {{ consulta.fecha_creacion.strftime('%d/%m/%Y %H:%M') }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    📭 No hay consultas a empresas registradas aún
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- USUARIOS -->
+        <div class="section">
+            <div class="section-header">
+                👥 Usuarios del Sistema
+                <span class="count">{{ datos.usuarios|length }} registros</span>
+            </div>
+            {% if datos.usuarios %}
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre de Usuario</th>
+                                <th>Email</th>
+                                <th>Fecha Creación</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for usuario in datos.usuarios %}
+                            <tr>
+                                <td>{{ usuario.id }}</td>
+                                <td>{{ usuario.username }}</td>
+                                <td>{{ usuario.email }}</td>
+                                <td class="timestamp">
+                                    {% if usuario.fecha_creacion %}
+                                        {{ usuario.fecha_creacion.strftime('%d/%m/%Y %H:%M') }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    👤 No hay usuarios registrados aún
+                </div>
+            {% endif %}
+        </div>
+        
+        <div style="text-align: center; margin-top: 40px; padding: 20px; background: #f8f9fa; border-radius: 5px;">
+            <p style="color: #6c757d; margin: 0;">
+                📊 Esta página se actualiza automáticamente cuando agregas nuevos datos<br>
+                🔄 Última actualización: <span id="timestamp"></span>
+            </p>
+        </div>
+    </div>
+    
+    <script>
+        // Mostrar timestamp actual
+        document.getElementById('timestamp').textContent = new Date().toLocaleString('es-AR');
+        
+        // Auto-refresh cada 30 segundos
+        setTimeout(() => {
+            location.reload();
+        }, 30000);
+    </script>
+</body>
+</html>

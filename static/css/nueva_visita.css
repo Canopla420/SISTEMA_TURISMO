@@ -108,3 +108,100 @@ body {
 .boton-volver:hover {
   background-color: #5a6268;
 }
+
+/* Estilos para la selección de empresas */
+.lugares-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.lugar-item {
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  background: white;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.lugar-item:hover {
+  border-color: #005f73;
+  box-shadow: 0 4px 8px rgba(0, 95, 115, 0.2);
+}
+
+.lugar-item input[type="checkbox"] {
+  display: none;
+}
+
+.lugar-item input[type="checkbox"]:checked + .lugar-label {
+  background: linear-gradient(135deg, #005f73, #0a8fb5);
+  color: white;
+  border-color: #005f73;
+}
+
+.lugar-item input[type="checkbox"]:checked + .lugar-label .lugar-info h4 {
+  color: white;
+}
+
+.lugar-item input[type="checkbox"]:checked + .lugar-label .lugar-info p {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.lugar-label {
+  display: block;
+  padding: 15px;
+  cursor: pointer;
+  border: none;
+  background: white;
+  width: 100%;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+
+.lugar-info h4 {
+  margin: 0 0 8px 0;
+  color: #005f73;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.lugar-info p {
+  margin: 4px 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.lugar-info .categoria {
+  font-weight: 600;
+  color: #0a8fb5;
+}
+
+.lugar-info .contacto {
+  font-size: 13px;
+  color: #888;
+}
+
+/* Panel de información/advertencia */
+.info-panel.warning {
+  background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+  border: 1px solid #ffd93d;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 15px 0;
+}
+
+.info-panel.warning p {
+  margin: 8px 0;
+  color: #856404;
+}
+
+.info-panel.warning a {
+  color: #005f73;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.info-panel.warning a:hover {
+  text-decoration: underline;
+}

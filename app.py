@@ -4,14 +4,14 @@
 
 # Forzar UTF-8 y locale en Windows
 import sys
+import os
 if sys.platform.startswith('win'):
-    import os
     os.environ['PYTHONIOENCODING'] = 'utf-8'
     os.environ['LC_ALL'] = 'es_AR.UTF-8'
     os.environ['LANG'] = 'es_AR.UTF-8'
 
 from flask import Flask, request, jsonify, render_template, redirect, url_for, send_file
-from flask_mail import Mail
+from flask_mail import Mail, Message
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from reportlab.pdfgen import canvas
@@ -19,20 +19,34 @@ from reportlab.lib.units import inch
 import io
 from datetime import datetime
 from reportlab.lib.pagesizes import letter
-from dotenv import load_dotenv
-from config import config
-
-# Cargar variables de entorno desde .env
-load_dotenv()
-
+import os
 
 app = Flask(__name__)
 
-# Cargar configuración
-config_name = os.getenv('FLASK_CONFIG', 'development')
-app.config.from_object(config[config_name])
+# Configuración simple y directa
+app.config['SECRET_KEY'] = 'clave-super-secreta-para-desarrollo-2024'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///turismo.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['DEBUG'] = True
+
+# Configuración de correo
+# Para activar el envío real de correos, completa estos datos:
+MAIL_USERNAME = "canoezequiel7802@gmail.com"  # Tu Gmail real
+MAIL_PASSWORD = "adgj kgvv raua hcxl"   # Contraseña de aplicación (16 caracteres)
+
+# Configuración automática
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = MAIL_USERNAME
+app.config['MAIL_PASSWORD'] = MAIL_PASSWORD
+app.config['MAIL_DEFAULT_SENDER'] = MAIL_USERNAME
+
+# Si las credenciales son válidas, habilitamos el envío real
+MAIL_ENABLED = MAIL_USERNAME != "tu_gmail_personal@gmail.com" and MAIL_PASSWORD != "tu_password_de_aplicacion"
 
 db = SQLAlchemy(app)
+mail = Mail(app)
 
 migrate = Migrate(app, db)
 # ------------------------------
@@ -81,11 +95,23 @@ class EmpresaTuristica(db.Model):
     duracion_visita = db.Column(db.String(50), nullable=True)
     fecha_creacion = db.Column(db.DateTime, default=datetime.utcnow)
 
+class ConsultaEmpresa(db.Model):
+    __tablename__ = 'consulta_empresa'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    empresa_id = db.Column(db.Integer, db.ForeignKey('empresa_turistica.id'), nullable=False)
+    fecha_consulta = db.Column(db.Date, nullable=False)
+    hora_consulta = db.Column(db.Time, nullable=False)
+    comentarios = db.Column(db.Text, nullable=True)
+    estado = db.Column(db.String(20), default='Pendiente')  # Pendiente, Confirmada, Rechazada
+    fecha_creacion = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Relación con empresa
+    empresa = db.relationship('EmpresaTuristica', backref='consultas')
+
 # Comentado temporalmente para evitar errores
 # class VisitaRealizada(db.Model):
 #     __tablename__ = 'visitas_realizadas'
-# 
-# class ConsultaEmpresa(db.Model):
 #     __tablename__ = 'consultas_empresas'
 # 
 # class Itinerario(db.Model):
@@ -257,27 +283,21 @@ def solicitar_visita_institucion():
         es_de_esperanza = 'esperanza' in localidad
         tipo_institucion = 'local' if es_de_esperanza else 'externa'
         
+        # Obtener empresas seleccionadas
+        empresas_seleccionadas_ids = request.form.getlist('empresas_seleccionadas')
+        empresas_seleccionadas_str = ",".join(empresas_seleccionadas_ids)
+        print(f"🔍 DEBUG: Empresas seleccionadas: {empresas_seleccionadas_str}")
+        
         # Capturar los datos del formulario
         solicitud = SolicitudVisita(
             nombre_institucion=request.form.get('nombre_institucion'),
-            localidad=request.form.get('localidad'),
-            tipo_institucion=tipo_institucion,
-            es_de_esperanza=es_de_esperanza,
-            director=request.form.get('director'),
-            correo_institucional=request.form.get('correo_institucional'),
-            telefono_institucion=request.form.get('telefono_institucion'),
-            contacto_principal=request.form.get('contacto_principal'),
-            telefono_contacto_principal=request.form.get('telefono_contacto_principal'),
-            relacion_contacto=request.form.get('relacion_contacto'),
-            contacto_suplente=request.form.get('contacto_suplente'),
-            telefono_contacto_suplente=request.form.get('telefono_contacto_suplente'),
-            nivel_educativo=request.form.get('nivel_educativo'),
+            responsable=request.form.get('contacto_principal', ''),
+            telefono=request.form.get('telefono_contacto_principal', ''),
+            email=request.form.get('correo_institucional', ''),
             cantidad_alumnos=int(request.form.get('cantidad_alumnos', 0)),
-            edad_alumnos=request.form.get('edad_alumnos'),
-            discapacidad=request.form.get('discapacidad'),
-            tipo_discapacidad=request.form.get('tipo_discapacidad'),
-            adaptacion=request.form.get('adaptacion'),
-            empresas_seleccionadas=",".join(request.form.getlist('lugares[]')),  # Ahora son empresas
+            edad_alumnos=request.form.get('edad_alumnos', ''),
+            discapacidad=request.form.get('discapacidad', 'No'),
+            empresas_seleccionadas=empresas_seleccionadas_str,
             fecha_visita=fecha_visita,
             hora_grupo1=hora_grupo1,
             hora_grupo2=hora_grupo2,
@@ -295,8 +315,9 @@ def solicitar_visita_institucion():
             return "Error al procesar la solicitud", 500
 
     # Renderizar el formulario si es una solicitud GET
-    # Las empresas se filtrarán dinámicamente según el tipo de institución y nivel educativo
-    return render_template('nueva_visita.html')
+    # Obtener todas las empresas para mostrar en el formulario
+    empresas = EmpresaTuristica.query.all()
+    return render_template('nueva_visita.html', empresas=empresas)
 
 @app.route('/modificar_visita/<int:visita_id>', methods=['GET', 'POST'])
 def modificar_visita(visita_id):
@@ -305,18 +326,16 @@ def modificar_visita(visita_id):
 
     if request.method == 'POST':
         try:
+            # Debug: mostrar todos los datos recibidos
+            print("🔍 Datos recibidos del formulario:")
+            for key, value in request.form.items():
+                print(f"  {key}: {value}")
+            
             # Actualizar todos los datos de la visita con los valores enviados desde el formulario
             visita.nombre_institucion = request.form.get('nombre_institucion')
-            visita.localidad = request.form.get('localidad')
-            visita.director = request.form.get('director')
-            visita.correo_institucional = request.form.get('correo_institucional')
-            visita.telefono_institucion = request.form.get('telefono_institucion')
-            visita.contacto_principal = request.form.get('contacto_principal')
-            visita.telefono_contacto_principal = request.form.get('telefono_contacto_principal')
-            visita.relacion_contacto = request.form.get('relacion_contacto')
-            visita.contacto_suplente = request.form.get('contacto_suplente')
-            visita.telefono_contacto_suplente = request.form.get('telefono_contacto_suplente')
-            visita.nivel_educativo = request.form.get('nivel_educativo')
+            visita.responsable = request.form.get('contacto_principal', '')
+            visita.telefono = request.form.get('telefono_contacto_principal', '')
+            visita.email = request.form.get('correo_institucional', '')
             
             # Convertir cantidad_alumnos a entero
             cantidad_str = request.form.get('cantidad_alumnos')
@@ -324,8 +343,6 @@ def modificar_visita(visita_id):
             
             visita.edad_alumnos = request.form.get('edad_alumnos')
             visita.discapacidad = request.form.get('discapacidad')
-            visita.tipo_discapacidad = request.form.get('tipo_discapacidad')
-            visita.adaptacion = request.form.get('adaptacion')
             visita.empresas_seleccionadas = ",".join(request.form.getlist('lugares[]'))  # Corregido nombre de campo
             
             # Convertir fecha de string a date object
@@ -366,7 +383,7 @@ def modificar_visita(visita_id):
             return f"Error al modificar visita: {e}", 500
 
     # Renderizar el formulario con los datos actuales de la visita
-    return render_template('modificar_visita.html', visita=visita)
+    return render_template('modificar_visita_nuevo.html', visita=visita)
 
 
 @app.route('/confirmacion_visita', methods=['GET'])
@@ -395,16 +412,25 @@ def eliminar_visita(visita_id):
 @app.route('/nueva_visita')
 def nueva_visita():
     """Formulario para registrar una nueva visita"""
-    return render_template('nueva_visita.html')
+    print("🔍 DEBUG: Accediendo a nueva_visita")
+    try:
+        # Obtener todas las empresas para mostrar en el formulario
+        empresas = EmpresaTuristica.query.all()
+        print(f"🔍 DEBUG: Se encontraron {len(empresas)} empresas")
+        
+        print("🔍 DEBUG: Intentando renderizar nueva_visita.html")
+        return render_template('nueva_visita.html', empresas=empresas)
+    except Exception as e:
+        print(f"❌ ERROR en nueva_visita: {e}")
+        return f"Error en nueva_visita: {e}", 500
 
 @app.route('/confirmar_visita/<int:visita_id>', methods=['POST'])
 def confirmar_visita(visita_id):
     """Confirmar una visita por su ID"""
     try:
         visita = SolicitudVisita.query.get_or_404(visita_id)
-        if visita.estado == "Pendiente":
-            visita.estado = "Confirmada"
-            db.session.commit()
+        visita.estado = "Confirmada"
+        db.session.commit()
         return redirect(url_for('consultar_visitas'))
     except (ValueError, TypeError, OSError) as e:
         db.session.rollback()
@@ -416,13 +442,25 @@ def rechazar_visita(visita_id):
     """Rechazar una visita por su ID"""
     try:
         visita = SolicitudVisita.query.get_or_404(visita_id)
-        if visita.estado in ["Confirmada", "Pendiente"]:
-            visita.estado = "Rechazada"
-            db.session.commit()
+        visita.estado = "Rechazada"
+        db.session.commit()
         return redirect(url_for('consultar_visitas'))
     except (ValueError, TypeError, OSError) as e:
         db.session.rollback()
         print(f"Error al rechazar visita: {e}")
+        return redirect(url_for('consultar_visitas'))
+
+@app.route('/pendiente_visita/<int:visita_id>', methods=['POST'])
+def pendiente_visita(visita_id):
+    """Volver una visita a estado Pendiente"""
+    try:
+        visita = SolicitudVisita.query.get_or_404(visita_id)
+        visita.estado = "Pendiente"
+        db.session.commit()
+        return redirect(url_for('consultar_visitas'))
+    except (ValueError, TypeError, OSError) as e:
+        db.session.rollback()
+        print(f"Error al cambiar visita a pendiente: {e}")
         return redirect(url_for('consultar_visitas'))
 
 @app.route('/consultar_visitas', methods=['GET', 'POST'])
@@ -470,25 +508,30 @@ def consultar_visitas():
 @app.route('/consultar_empresas', methods=['GET'])
 def consultar_empresas():
     """Pantalla para consultar empresas"""
-    return render_template('consultar_empresas.html')
+    try:
+        empresas = EmpresaTuristica.query.all()
+        print(f"🔍 DEBUG: Encontradas {len(empresas)} empresas para consultar")
+        return render_template('consultar_empresas.html', empresas=empresas)
+    except Exception as e:
+        print(f"❌ ERROR en consultar_empresas: {e}")
+        return render_template('consultar_empresas.html', empresas=[])
 
 @app.route('/todas_empresas', methods=['GET'])
 def todas_empresas():
-    """Devuelve la lista de empresas activas en formato JSON"""
+    """Devuelve la lista de empresas en formato JSON"""
     try:
-        empresas = EmpresaTuristica.query.filter_by(activa=True).all()
+        empresas = EmpresaTuristica.query.all()
         empresas_json = []
         for empresa in empresas:
             empresas_json.append({
                 "id": empresa.id,
                 "nombre": empresa.nombre,
-                "correo": empresa.correo,
+                "email": empresa.email,
                 "telefono": empresa.telefono,
                 "direccion": empresa.direccion,
-                "servicios_ofrecidos": empresa.servicios_ofrecidos,
-                "categoria_turismo": empresa.categoria_turismo,
-                "nivel_educativo_objetivo": empresa.nivel_educativo_objetivo,
-                "costo_por_persona": float(empresa.costo_por_persona) if empresa.costo_por_persona else None
+                "categoria": empresa.categoria,
+                "capacidad_maxima": empresa.capacidad_maxima,
+                "duracion_visita": empresa.duracion_visita
             })
         return jsonify(empresas_json)
     except (ValueError, TypeError, OSError) as e:
@@ -507,7 +550,7 @@ def empresas_filtradas():
         categoria_turismo = 'identidad' if es_de_esperanza else 'educativo'
         
         # Construir query base
-        query = EmpresaTuristica.query.filter_by(activa=True, categoria_turismo=categoria_turismo)
+        query = EmpresaTuristica.query.filter_by(categoria=categoria_turismo)
         
         # Filtrar por nivel educativo
         if nivel_educativo in ['Primario', 'Secundario']:
@@ -523,13 +566,13 @@ def empresas_filtradas():
             empresas_json.append({
                 "id": empresa.id,
                 "nombre": empresa.nombre,
-                "correo": empresa.correo,
+                "email": empresa.email,
                 "telefono": empresa.telefono,
                 "direccion": empresa.direccion,
-                "servicios_ofrecidos": empresa.servicios_ofrecidos,
-                "categoria_turismo": empresa.categoria_turismo,
-                "nivel_educativo_objetivo": empresa.nivel_educativo_objetivo,
-                "costo_por_persona": float(empresa.costo_por_persona) if empresa.costo_por_persona else None
+                "descripcion": empresa.descripcion,
+                "categoria": empresa.categoria,
+                "capacidad_maxima": empresa.capacidad_maxima,
+                "duracion_visita": empresa.duracion_visita
             })
         
         return jsonify(empresas_json)
@@ -543,8 +586,7 @@ def buscar_empresa():
     try:
         query = request.args.get("q", "").lower()
         empresas = EmpresaTuristica.query.filter(
-            EmpresaTuristica.nombre.ilike(f'%{query}%'),
-            EmpresaTuristica.activa == True
+            EmpresaTuristica.nombre.ilike(f'%{query}%')
         ).all()
         
         coincidencias = []
@@ -552,7 +594,7 @@ def buscar_empresa():
             coincidencias.append({
                 "id": empresa.id,
                 "nombre": empresa.nombre,
-                "correo": empresa.correo,
+                "email": empresa.email,
                 "telefono": empresa.telefono
             })
         return jsonify(coincidencias)
@@ -568,51 +610,108 @@ def enviar_consulta():
         correo = request.form.get('correo')
         fecha_str = request.form.get('fecha')
         hora_str = request.form.get('hora')
-        comentarios = request.form.get('comentarios')
+        comentarios = request.form.get('comentarios', '')
+
+        print(f"🔍 DEBUG: Procesando consulta para empresa: {empresa_nombre}")
+        print(f"🔍 DEBUG: Correo: {correo}, Fecha: {fecha_str}, Hora: {hora_str}")
 
         if not (empresa_nombre and correo and fecha_str and hora_str):
-            return jsonify({"error": "Faltan datos obligatorios"}), 400
+            return jsonify({"error": "Faltan datos obligatorios (empresa, correo, fecha y hora)"}), 400
 
         # Buscar la empresa en la base de datos
-        empresa = EmpresaTuristica.query.filter_by(nombre=empresa_nombre, activa=True).first()
+        empresa = EmpresaTuristica.query.filter_by(nombre=empresa_nombre).first()
         if not empresa:
             return jsonify({"error": "Empresa no encontrada"}), 404
 
         # Convertir fecha y hora
-        fecha_consulta = datetime.strptime(fecha_str, '%Y-%m-%d').date()
-        hora_consulta = datetime.strptime(hora_str, '%H:%M').time()
+        try:
+            fecha_consulta = datetime.strptime(fecha_str, '%Y-%m-%d').date()
+            hora_consulta = datetime.strptime(hora_str, '%H:%M').time()
+        except ValueError as e:
+            return jsonify({"error": f"Formato de fecha u hora inválido: {e}"}), 400
 
-        # Guardar la consulta en la base de datos - COMENTADO TEMPORALMENTE
-        # consulta = ConsultaEmpresa(
-        #     empresa_id=empresa.id,
-        #     fecha_consulta=fecha_consulta,
-        #     hora_consulta=hora_consulta,
-        #     comentarios=comentarios
-        # )
-        # db.session.add(consulta)
+        # Guardar la consulta en la base de datos
+        consulta = ConsultaEmpresa(
+            empresa_id=empresa.id,
+            fecha_consulta=fecha_consulta,
+            hora_consulta=hora_consulta,
+            comentarios=comentarios
+        )
+        db.session.add(consulta)
         db.session.commit()
 
-        # Crear y enviar el correo (comentado para evitar errores sin configuración real)
-        # try:
-        #     msg = Message('Consulta de disponibilidad',
-        #                   sender=app.config['MAIL_USERNAME'],
-        #                   recipients=[correo])
-        #     msg.body = f"""
-        #     Hola {empresa_nombre},
-        #     
-        #     Queremos saber si están disponibles en la fecha {fecha_str} a las {hora_str}.
-        #     
-        #     Comentarios adicionales:
-        #     {comentarios}
-        #     
-        #     Saludos,
-        #     Sistema de Gestión de Visitas - ITEC
-        #     """
-        #     mail.send(msg)
-        # except Exception as mail_error:
-        #     print(f"Error al enviar correo: {mail_error}")
+        print(f"✅ DEBUG: Consulta guardada con ID: {consulta.id}")
+
+        # Crear y enviar el correo
+        mensaje_correo = ""
+        try:
+            # Formatear fecha y hora para el correo
+            fecha_formatted = fecha_consulta.strftime("%d/%m/%Y")
+            hora_formatted = hora_consulta.strftime("%H:%M")
+            
+            # Crear el mensaje
+            asunto = f"Consulta de disponibilidad - {fecha_formatted}"
+            
+            cuerpo_mensaje = f"""Hola,
+
+La Dirección de Turismo de Esperanza consulta disponibilidad para una visita:
+
+Fecha: {fecha_formatted}
+Hora: {hora_formatted}
+Empresa: {empresa.nombre}
+
+Comentarios: {comentarios if comentarios else 'Ninguno'}
+
+Por favor confirmen disponibilidad respondiendo a este correo.
+
+Saludos,
+Sistema de Turismo - Esperanza
+Consulta ID: {consulta.id}
+"""
+
+            # Verificar si el correo está habilitado
+            if MAIL_ENABLED:
+                # Crear y enviar el mensaje
+                print(f"🔄 DEBUG: Intentando enviar correo desde {MAIL_USERNAME} hacia {correo}")
+                msg = Message(
+                    subject=asunto,
+                    recipients=[correo],
+                    body=cuerpo_mensaje
+                )
+                
+                # Intentar enviar el correo
+                mail.send(msg)
+                print(f"✅ DEBUG: Correo enviado exitosamente a {correo}")
+                mensaje_correo = "✅ Correo enviado exitosamente"
+            else:
+                print(f"⚠️ DEBUG: Configuración de correo no disponible. Simulando envío a {correo}")
+                print(f"📧 CONTENIDO DEL CORREO:\n{cuerpo_mensaje}")
+                mensaje_correo = "📧 Consulta registrada (correo simulado - configurar MAIL_USERNAME y MAIL_PASSWORD para envío real)"
+            
+            return jsonify({
+                "mensaje": "Consulta enviada exitosamente", 
+                "empresa": empresa_nombre,
+                "fecha": fecha_formatted,
+                "hora": hora_formatted,
+                "correo": correo,
+                "estado_correo": mensaje_correo
+            }), 200
+            
+        except Exception as mail_error:
+            print(f"❌ ERROR al enviar correo: {mail_error}")
+            # Aunque falle el correo, la consulta ya está guardada
+            return jsonify({
+                "mensaje": "Consulta registrada correctamente, pero hubo un problema al enviar el correo",
+                "error_correo": str(mail_error),
+                "empresa": empresa_nombre,
+                "fecha": fecha_formatted,
+                "hora": hora_formatted
+            }), 200
         
-        return jsonify({"mensaje": "Consulta registrada correctamente"}), 200
+    except Exception as e:
+        print(f"❌ ERROR general en enviar_consulta: {e}")
+        db.session.rollback()
+        return jsonify({"error": f"Error interno del servidor: {str(e)}"}), 500
         
     except (ValueError, TypeError, OSError) as e:
         db.session.rollback()
@@ -623,13 +722,17 @@ def enviar_consulta():
 @app.route('/gestionar_empresas', methods=['GET'])
 def gestionar_empresas():
     """Pantalla para gestionar empresas (CRUD)"""
+    print("🔍 DEBUG: Accediendo a gestionar_empresas")
     try:
+        print("🔍 DEBUG: Consultando empresas...")
         empresas = EmpresaTuristica.query.all()
+        print(f"🔍 DEBUG: Encontradas {len(empresas)} empresas")
+        print("🔍 DEBUG: Intentando renderizar gestionar_empresas.html")
         return render_template('gestionar_empresas.html', empresas=empresas)
-    except (ValueError, TypeError, OSError) as e:
-        print(f"Error en gestionar_empresas: {e}")
+    except Exception as e:
+        print(f"❌ ERROR en gestionar_empresas: {e}")
         # Devolver una página con lista vacía en caso de error
-        return render_template('gestionar_empresas.html', empresas=[])
+        return f"Error en gestionar_empresas: {e}", 500
 
 @app.route('/agregar_empresa', methods=['GET', 'POST'])
 def agregar_empresa():
@@ -642,8 +745,8 @@ def agregar_empresa():
                 descripcion=request.form.get('descripcion'),
                 direccion=request.form.get('direccion'),
                 telefono=request.form.get('telefono'),
-                email=request.form.get('correo'),
-                categoria=request.form.get('categoria_turismo'),
+                email=request.form.get('email'),
+                categoria=request.form.get('categoria'),
                 capacidad_maxima=int(request.form.get('capacidad_maxima', 0)) if request.form.get('capacidad_maxima') else None,
                 duracion_visita=request.form.get('duracion_visita')
             )
@@ -675,18 +778,18 @@ def editar_empresa(empresa_id):
             capacidad = int(capacidad_str) if capacidad_str and capacidad_str.strip() else None
             
             empresa.nombre = request.form.get('nombre')
-            empresa.correo = request.form.get('correo')
+            empresa.email = request.form.get('email')
             empresa.telefono = request.form.get('telefono')
             empresa.direccion = request.form.get('direccion')
-            empresa.servicios_ofrecidos = request.form.get('servicios_ofrecidos')
             empresa.descripcion = request.form.get('descripcion')
-            empresa.categoria_turismo = request.form.get('categoria_turismo')
-            empresa.nivel_educativo_objetivo = request.form.get('nivel_educativo_objetivo')
+            empresa.categoria = request.form.get('categoria')
+            
+            # Validar capacidad
+            capacidad_str = request.form.get('capacidad_maxima', '').strip()
+            capacidad = int(capacidad_str) if capacidad_str and capacidad_str.isdigit() else None
             empresa.capacidad_maxima = capacidad
-            empresa.horarios_atencion = request.form.get('horarios_atencion')
-            empresa.costo_por_persona = costo
-            empresa.requiere_reserva = bool(request.form.get('requiere_reserva'))
-            empresa.activa = bool(request.form.get('activa', True))
+            
+            empresa.duracion_visita = request.form.get('duracion_visita')
             
             db.session.commit()
             return redirect(url_for('gestionar_empresas'))
@@ -699,10 +802,10 @@ def editar_empresa(empresa_id):
 
 @app.route('/eliminar_empresa/<int:empresa_id>', methods=['POST'])
 def eliminar_empresa(empresa_id):
-    """Desactivar una empresa (soft delete)"""
+    """Eliminar una empresa definitivamente"""
     try:
         empresa = EmpresaTuristica.query.get_or_404(empresa_id)
-        empresa.activa = False
+        db.session.delete(empresa)
         db.session.commit()
         return redirect(url_for('gestionar_empresas'))
     except (ValueError, TypeError, OSError) as e:
@@ -746,11 +849,9 @@ def crear_itinerario():
             datos = [
                 ("Institución", visita.nombre_institucion),
                 ("Fecha de visita", fecha_formateada),
-                ("Localidad", visita.localidad),
-                ("Director/a", visita.director),
-                ("Correo", visita.correo_institucional),
-                ("Teléfono", visita.telefono_institucion),
-                ("Nivel educativo", visita.nivel_educativo),
+                ("Responsable", visita.responsable),
+                ("Correo", visita.email),
+                ("Teléfono", visita.telefono),
                 ("Cantidad de alumnos", str(visita.cantidad_alumnos)),
                 ("Hora Grupo 1", hora1_formateada),
                 ("Hora Grupo 2", hora2_formateada),
@@ -804,8 +905,142 @@ def crear_itinerario():
 
 
 # ------------------------------
+# Ruta para ver datos de la base de datos
+# ------------------------------
+
+@app.route('/ver_datos')
+def ver_datos():
+    """Página para visualizar todos los datos de la base de datos"""
+    try:
+        # Obtener datos de todas las tablas
+        empresas = EmpresaTuristica.query.all()
+        visitas = SolicitudVisita.query.all()
+        consultas = ConsultaEmpresa.query.all()
+        usuarios = Usuario.query.all()
+        
+        datos = {
+            'empresas': empresas,
+            'visitas': visitas,
+            'consultas': consultas,
+            'usuarios': usuarios
+        }
+        
+        return render_template('ver_datos.html', datos=datos)
+    except Exception as e:
+        return f"Error al obtener datos: {e}", 500
+
+@app.route('/ver_datos_json')
+def ver_datos_json():
+    """API para ver todos los datos en formato JSON"""
+    try:
+        # Empresas
+        empresas = []
+        for empresa in EmpresaTuristica.query.all():
+            empresas.append({
+                'id': empresa.id,
+                'nombre': empresa.nombre,
+                'email': empresa.email,
+                'telefono': empresa.telefono,
+                'categoria': empresa.categoria,
+                'fecha_creacion': empresa.fecha_creacion.strftime('%Y-%m-%d %H:%M:%S') if empresa.fecha_creacion else None
+            })
+        
+        # Visitas
+        visitas = []
+        for visita in SolicitudVisita.query.all():
+            visitas.append({
+                'id': visita.id,
+                'institucion': visita.nombre_institucion,
+                'responsable': visita.responsable,
+                'email': visita.email,
+                'cantidad_alumnos': visita.cantidad_alumnos,
+                'estado': visita.estado,
+                'fecha_visita': visita.fecha_visita.strftime('%Y-%m-%d') if visita.fecha_visita else None,
+                'fecha_solicitud': visita.fecha_solicitud.strftime('%Y-%m-%d %H:%M:%S') if visita.fecha_solicitud else None
+            })
+        
+        # Consultas
+        consultas = []
+        for consulta in ConsultaEmpresa.query.all():
+            consultas.append({
+                'id': consulta.id,
+                'empresa_id': consulta.empresa_id,
+                'empresa_nombre': consulta.empresa.nombre if consulta.empresa else 'N/A',
+                'fecha_consulta': consulta.fecha_consulta.strftime('%Y-%m-%d') if consulta.fecha_consulta else None,
+                'hora_consulta': consulta.hora_consulta.strftime('%H:%M') if consulta.hora_consulta else None,
+                'comentarios': consulta.comentarios,
+                'estado': consulta.estado,
+                'fecha_creacion': consulta.fecha_creacion.strftime('%Y-%m-%d %H:%M:%S') if consulta.fecha_creacion else None
+            })
+        
+        return jsonify({
+            'empresas': empresas,
+            'visitas': visitas,
+            'consultas': consultas,
+            'resumen': {
+                'total_empresas': len(empresas),
+                'total_visitas': len(visitas),
+                'total_consultas': len(consultas)
+            }
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# ------------------------------
+# Funciones auxiliares
+# ------------------------------
+
+def obtener_nombres_empresas(empresas_ids_str):
+    """
+    Convierte una cadena de IDs de empresas separados por comas
+    en una lista de nombres de empresas
+    """
+    if not empresas_ids_str:
+        return []
+    
+    try:
+        # Convertir string de IDs a lista de enteros
+        ids_empresas = [int(id_str.strip()) for id_str in empresas_ids_str.split(',') if id_str.strip()]
+        
+        # Buscar las empresas por ID
+        empresas = EmpresaTuristica.query.filter(EmpresaTuristica.id.in_(ids_empresas)).all()
+        
+        # Retornar lista de nombres
+        return [empresa.nombre for empresa in empresas]
+    except (ValueError, TypeError) as e:
+        print(f"Error al obtener nombres de empresas: {e}")
+        return []
+
+# Registrar función para usar en templates
+@app.template_filter('empresas_nombres')
+def empresas_nombres_filter(empresas_ids_str):
+    """Filtro para templates que convierte IDs de empresas a nombres"""
+    nombres = obtener_nombres_empresas(empresas_ids_str)
+    if nombres:
+        return ', '.join(nombres)
+    return 'Ninguna empresa seleccionada'
+
+
+# ------------------------------
 # Ejecución de la aplicación
 # ------------------------------
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    with app.app_context():
+        # Crear las tablas automáticamente
+        db.create_all()
+        print("✅ Base de datos lista")
+        
+        # Mostrar estado del correo
+        if MAIL_ENABLED:
+            print(f"📧 Correo ACTIVADO - Enviando desde: {MAIL_USERNAME}")
+            print(f"🔐 Contraseña configurada: {'Sí' if MAIL_PASSWORD != 'tu_password_de_aplicacion' else 'No'}")
+        else:
+            print("⚠️  Correo en MODO SIMULADO")
+            print("Para activar envío real:")
+            print("1. Edita app.py líneas 31-32")
+            print("2. Coloca tu Gmail y contraseña de aplicación")
+            print("3. Reinicia la aplicación")
+    
+    print("🌐 Aplicación corriendo en http://localhost:5000")
+    app.run(host='127.0.0.1', port=5000, debug=True)
