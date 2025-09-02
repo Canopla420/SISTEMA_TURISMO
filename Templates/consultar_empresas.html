@@ -16,10 +16,10 @@
     <div class="container">
         <!-- Información del proceso -->
         <div class="section">
-            <div class="info-panel">
-                <div class="info-item">
-                    <strong>🔍 Búsqueda:</strong> 
-                    Utilice el campo de búsqueda para encontrar empresas específicas o explore todas las opciones disponibles.
+            <div class="info-panel" style="background: #f1f5f9; border-left: 6px solid #005f73; padding: 18px 24px; border-radius: 12px; margin-bottom: 18px;">
+                <div class="info-item" style="font-size: 1.08em; color: #222;">
+                    <strong style="color: #005f73;">🔍 Búsqueda institucional:</strong> <br>
+                    Utilice el buscador para filtrar empresas habilitadas por la municipalidad. Todas las consultas se gestionan de manera formal y quedan registradas.
                 </div>
             </div>
         </div>
@@ -85,23 +85,25 @@
 
         <!-- Información adicional -->
         <div class="section">
-            <h2>ℹ️ Información de Consultas</h2>
-            <div class="info-panel">
-                <div class="info-item">
-                    <strong>📧 Envío automático:</strong> 
-                    Su consulta se enviará directamente al correo electrónico de la empresa seleccionada.
+            <h2 style="color: #005f73; font-size: 1.15em; font-weight: 600; margin-bottom: 10px;">ℹ️ Información Institucional</h2>
+            <div class="info-panel" style="background: #f8f9fa; border-left: 6px solid #0a9396; padding: 18px 24px; border-radius: 12px;">
+                <div class="info-item" style="margin-bottom: 8px;">
+                    <strong style="color: #0a9396;">📧 Envío formal:</strong> Las consultas se envían directamente al correo oficial de la empresa seleccionada, con copia registrada en el sistema municipal.
+                </div>
+                <div class="info-item" style="margin-bottom: 8px;">
+                    <strong style="color: #0a9396;">⏰ Tiempo de respuesta:</strong> Las empresas están obligadas a responder en un plazo de 24-48 horas hábiles.
                 </div>
                 <div class="info-item">
-                    <strong>⏰ Tiempo de respuesta:</strong> 
-                    Las empresas suelen responder en un plazo de 24-48 horas hábiles.
-                </div>
-                <div class="info-item">
-                    <strong>📞 Contacto directo:</strong> 
-                    Para consultas urgentes, puede contactar directamente a la empresa usando la información proporcionada.
+                    <strong style="color: #0a9396;">📞 Contacto institucional:</strong> Para consultas urgentes, comuníquese con la Dirección de Turismo: <br>
+                    <span style="font-size: 0.98em; color: #333;">Dirección: Av. Principal 123, Ciudad Turística<br>Teléfono: (03456) 123456<br>Email: turismo@municipalidad.gob.ar</span>
                 </div>
             </div>
         </div>
     </div>
+    <!-- Pie de página institucional -->
+    <footer style="background: #005f73; color: white; text-align: center; padding: 18px 0; margin-top: 40px; border-radius: 20px 20px 0 0; font-size: 1em;">
+        <div>Municipalidad de Turismo &copy; 2025 | Dirección: Av. Principal 123, Ciudad Turística | Tel: (03456) 123456 | Email: turismo@municipalidad.gob.ar</div>
+    </footer>
 
     <!-- Estilos específicos para consultar empresas -->
     <style>
@@ -259,15 +261,7 @@
             const correoInput = document.getElementById('correo');
             
             // Datos de empresas desde el servidor
-            const empresas = [
-                {% for empresa in empresas %}
-                {
-                    nombre: "{{ empresa.nombre }}",
-                    email: "{{ empresa.email }}",
-                    id: {{ empresa.id }}
-                }{% if not loop.last %},{% endif %}
-                {% endfor %}
-            ];
+            var empresas = {{ empresas_js|tojson|safe }};
             
             // Función para buscar empresa por nombre
             function buscarEmpresaPorNombre(nombre) {

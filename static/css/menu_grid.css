@@ -1,0 +1,51 @@
+/* Estilos para la grilla de accesos rápidos en la pantalla principal */
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.menu-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  padding: 18px 12px 14px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: #1a2a3a;
+  min-height: 120px;
+  transition: box-shadow 0.2s, transform 0.2s;
+  border: 2px solid #e0e0e0;
+}
+.menu-card:hover {
+  box-shadow: 0 6px 18px rgba(0,95,115,0.13);
+  transform: translateY(-3px) scale(1.03);
+  border-color: #005f73;
+}
+.menu-icon {
+  font-size: 2.2rem;
+  margin-bottom: 8px;
+}
+.menu-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 2px;
+  text-align: center;
+}
+.menu-description {
+  font-size: 0.97rem;
+  color: #4a4a4a;
+  text-align: center;
+}
+
+@media (max-width: 700px) {
+  .menu-grid {
+    grid-template-columns: 1fr;
+  }
+  .container {
+    padding: 18px !important;
+  }
+}

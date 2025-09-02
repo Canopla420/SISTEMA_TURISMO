@@ -75,45 +75,65 @@ def agregar_datos_prueba():
             # Solicitudes de visita de prueba
             visitas_datos = [
                 {
-                    'empresa_id': empresas_creadas[0].id,
+                    'nombre_institucion': 'Escuela N°1',
+                    'responsable': 'Juan Pérez',
+                    'telefono': '3794-111222',
+                    'email': 'juan.perez@email.com',
+                    'cantidad_alumnos': 30,
+                    'edad_alumnos': '12-13',
+                    'discapacidad': 'No',
+                    'empresas_seleccionadas': str(empresas_creadas[0].id),
                     'fecha_visita': date(2024, 2, 15),
-                    'hora_visita': time(10, 30),
-                    'nombre_visitante': 'Juan Pérez',
-                    'email_visitante': 'juan.perez@email.com',
-                    'telefono_visitante': '3794-111222',
+                    'hora_grupo1': time(10, 30),
+                    'hora_grupo2': None,
                     'observaciones': 'Interesado en tour de aventura',
                     'estado': 'Pendiente'
                 },
                 {
-                    'empresa_id': empresas_creadas[1].id,
+                    'nombre_institucion': 'Colegio San Martín',
+                    'responsable': 'María García',
+                    'telefono': '3794-333444',
+                    'email': 'maria.garcia@email.com',
+                    'cantidad_alumnos': 25,
+                    'edad_alumnos': '14-15',
+                    'discapacidad': 'No',
+                    'empresas_seleccionadas': str(empresas_creadas[1].id),
                     'fecha_visita': date(2024, 2, 20),
-                    'hora_visita': time(14, 0),
-                    'nombre_visitante': 'María García',
-                    'email_visitante': 'maria.garcia@email.com',
-                    'telefono_visitante': '3794-333444',
+                    'hora_grupo1': time(14, 0),
+                    'hora_grupo2': None,
                     'observaciones': 'Consulta por reserva de habitación',
                     'estado': 'Confirmada'
                 },
                 {
-                    'empresa_id': empresas_creadas[2].id,
+                    'nombre_institucion': 'Instituto Técnico',
+                    'responsable': 'Carlos López',
+                    'telefono': '3794-555666',
+                    'email': 'carlos.lopez@email.com',
+                    'cantidad_alumnos': 40,
+                    'edad_alumnos': '16-17',
+                    'discapacidad': 'Sí',
+                    'empresas_seleccionadas': str(empresas_creadas[2].id),
                     'fecha_visita': date(2024, 2, 25),
-                    'hora_visita': time(16, 15),
-                    'nombre_visitante': 'Carlos López',
-                    'email_visitante': 'carlos.lopez@email.com',
-                    'telefono_visitante': '3794-555666',
+                    'hora_grupo1': time(16, 15),
+                    'hora_grupo2': None,
                     'observaciones': 'Tour para grupo familiar',
                     'estado': 'Pendiente'
                 }
             ]
-            
+
             for datos in visitas_datos:
                 visita = SolicitudVisita(
-                    empresa_id=datos['empresa_id'],
+                    nombre_institucion=datos['nombre_institucion'],
+                    responsable=datos['responsable'],
+                    telefono=datos['telefono'],
+                    email=datos['email'],
+                    cantidad_alumnos=datos['cantidad_alumnos'],
+                    edad_alumnos=datos['edad_alumnos'],
+                    discapacidad=datos['discapacidad'],
+                    empresas_seleccionadas=datos['empresas_seleccionadas'],
                     fecha_visita=datos['fecha_visita'],
-                    hora_visita=datos['hora_visita'],
-                    nombre_visitante=datos['nombre_visitante'],
-                    email_visitante=datos['email_visitante'],
-                    telefono_visitante=datos['telefono_visitante'],
+                    hora_grupo1=datos['hora_grupo1'],
+                    hora_grupo2=datos['hora_grupo2'],
                     observaciones=datos['observaciones'],
                     estado=datos['estado']
                 )
@@ -195,9 +215,9 @@ def mostrar_resumen():
             
             if visitas_count > 0:
                 print(f"\n🎯 Últimas Solicitudes de Visita:")
-                visitas = SolicitudVisita.query.order_by(SolicitudVisita.fecha_creacion.desc()).limit(3).all()
+                visitas = SolicitudVisita.query.order_by(SolicitudVisita.fecha_solicitud.desc()).limit(3).all()
                 for visita in visitas:
-                    print(f"   - {visita.nombre_visitante} -> {visita.empresa.nombre if visita.empresa else 'Sin empresa'} ({visita.estado})")
+                    print(f"   - {visita.nombre_institucion} ({visita.responsable}) - Estado: {visita.estado}")
             
         except Exception as e:
             print(f"❌ Error al mostrar resumen: {e}")

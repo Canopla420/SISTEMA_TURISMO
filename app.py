@@ -510,8 +510,16 @@ def consultar_empresas():
     """Pantalla para consultar empresas"""
     try:
         empresas = EmpresaTuristica.query.all()
+        empresas_js = [
+            {
+                'id': e.id,
+                'nombre': e.nombre,
+                'email': e.email,
+                'categoria': e.categoria
+            } for e in empresas
+        ]
         print(f"🔍 DEBUG: Encontradas {len(empresas)} empresas para consultar")
-        return render_template('consultar_empresas.html', empresas=empresas)
+        return render_template('consultar_empresas.html', empresas=empresas, empresas_js=empresas_js)
     except Exception as e:
         print(f"❌ ERROR en consultar_empresas: {e}")
         return render_template('consultar_empresas.html', empresas=[])
@@ -652,21 +660,42 @@ def enviar_consulta():
             # Crear el mensaje
             asunto = f"Consulta de disponibilidad - {fecha_formatted}"
             
-            cuerpo_mensaje = f"""Hola,
-
-La Dirección de Turismo de Esperanza consulta disponibilidad para una visita:
-
-Fecha: {fecha_formatted}
-Hora: {hora_formatted}
-Empresa: {empresa.nombre}
-
-Comentarios: {comentarios if comentarios else 'Ninguno'}
-
-Por favor confirmen disponibilidad respondiendo a este correo.
-
-Saludos,
-Sistema de Turismo - Esperanza
-Consulta ID: {consulta.id}
+            cuerpo_mensaje = f"""
+<html>
+    <body style="font-family: Arial, Helvetica, sans-serif; color: #222; background: #f8f9fa; margin:0; padding:0;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 30px auto; background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                    <tr>
+                        <td style="padding: 24px 32px 12px 32px; border-bottom: 2px solid #005f73; background: #fff;">
+                            <h2 style="margin:0; color:#005f73; font-size:1.6em; font-weight:700; letter-spacing:1px;">Municipalidad de Esperanza</h2>
+                            <div style="font-size:1.15em; color:#005f73; font-weight:500; margin-top:4px;">Dirección de Turismo</div>
+                        </td>
+                    </tr>
+            <tr>
+                <td style="padding: 24px 32px;">
+                    <p style="margin-top:0;">Estimados responsables de <strong>{empresa.nombre}</strong>:</p>
+                    <p>Nos comunicamos para consultar la <b>disponibilidad</b> de su establecimiento para una visita institucional.</p>
+                    <table style="width:100%; background:#f1f5f9; border-radius:8px; margin:18px 0; font-size:1em;">
+                        <tr><td style="padding:8px;"><strong>Fecha solicitada:</strong></td><td style="padding:8px;">{fecha_formatted}</td></tr>
+                        <tr><td style="padding:8px;"><strong>Hora solicitada:</strong></td><td style="padding:8px;">{hora_formatted}</td></tr>
+                        <tr><td style="padding:8px;"><strong>Empresa:</strong></td><td style="padding:8px;">{empresa.nombre}</td></tr>
+                        <tr><td style="padding:8px;"><strong>Comentarios:</strong></td><td style="padding:8px;">{comentarios if comentarios else 'Ninguno'}</td></tr>
+                    </table>
+                    <p>Por favor, confirme la disponibilidad respondiendo a este correo. Ante cualquier duda, puede comunicarse con la Dirección de Turismo.</p>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 18px 32px; background: #f1f5f9; color: #333; border-radius: 0 0 10px 10px; font-size:0.98em;">
+                    Atentamente,<br>
+                    <strong>Dirección de Turismo - Municipalidad de Esperanza</strong><br>
+                    Consulta ID: {consulta.id}<br>
+                    Dirección: Av. Principal 123, Ciudad Turística<br>
+                    Teléfono: (03456) 123456<br>
+                    Email: turismo@municipalidad.gob.ar
+                </td>
+            </tr>
+        </table>
+    </body>
+</html>
 """
 
             # Verificar si el correo está habilitado
@@ -676,7 +705,7 @@ Consulta ID: {consulta.id}
                 msg = Message(
                     subject=asunto,
                     recipients=[correo],
-                    body=cuerpo_mensaje
+                    html=cuerpo_mensaje
                 )
                 
                 # Intentar enviar el correo
@@ -826,6 +855,7 @@ def crear_itinerario():
             if not visita:
                 return "Visita no encontrada", 404
 
+
             buffer = io.BytesIO()
             p = canvas.Canvas(buffer, pagesize=letter)
             width, height = letter
@@ -833,18 +863,65 @@ def crear_itinerario():
             # Márgenes
             left_margin = right_margin = top_margin = bottom_margin = inch
 
-            # Título principal
-            p.setFont("Helvetica-Bold", 20)
+            # --- Encabezado institucional ---
+            logo_path = os.path.join('static', 'img', 'logo_esperanza.png')
+            if os.path.exists(logo_path):
+                p.drawImage(logo_path, left_margin, height - top_margin - 60, width=70, height=70, mask='auto')
+            p.setFont("Helvetica-Bold", 18)
             p.setFillColorRGB(0.1, 0.2, 0.4)
-            # (Eliminado bloque incorrecto de creación de empresa)
-            p.setFillColorRGB(0, 0, 0)
-            y = height - top_margin - 100
-            line_space = 20
+            p.drawString(left_margin + 80, height - top_margin - 20, "Municipalidad de Esperanza")
+            p.setFont("Helvetica", 13)
+            p.setFillColorRGB(0.1, 0.2, 0.4)
+            p.drawString(left_margin + 80, height - top_margin - 40, "Dirección de Turismo")
+            p.setStrokeColorRGB(0.1, 0.2, 0.4)
+            p.setLineWidth(2)
+            p.line(left_margin, height - top_margin - 70, width - right_margin, height - top_margin - 70)
 
-            # Formatear fecha y horas
+            # --- Título central ---
+            p.setFont("Helvetica-Bold", 17)
+            p.setFillColorRGB(0, 0, 0)
+            p.drawCentredString(width / 2, height - top_margin - 90, "Itinerario de Visita Turística")
+
+            # --- Datos de la visita ---
+            y = height - top_margin - 130
+            line_space = 22
             fecha_formateada = visita.fecha_visita.strftime('%d/%m/%Y') if visita.fecha_visita else "No especificada"
             hora1_formateada = visita.hora_grupo1.strftime('%H:%M') if visita.hora_grupo1 else "No especificada"
             hora2_formateada = visita.hora_grupo2.strftime('%H:%M') if visita.hora_grupo2 else "No especificada"
+
+
+            # Obtener datos detallados de empresas
+            empresas_detalle = []
+            empresas_nombres = visita.empresas_seleccionadas
+            # Intentar obtener por IDs
+            ids = [eid.strip() for eid in empresas_nombres.split(',') if eid.strip().isdigit()]
+            if ids:
+                empresas = EmpresaTuristica.query.filter(EmpresaTuristica.id.in_(ids)).all()
+                for e in empresas:
+                    empresas_detalle.append({
+                        'nombre': e.nombre,
+                        'direccion': e.direccion or '-',
+                        'telefono': e.telefono or '-',
+                        'email': e.email or '-',
+                        'categoria': e.categoria or '-'
+                    })
+            else:
+                # Si no hay IDs, asumir que son nombres separados por coma
+                nombres = [n.strip() for n in empresas_nombres.split(',') if n.strip()]
+                if nombres:
+                    empresas = EmpresaTuristica.query.filter(EmpresaTuristica.nombre.in_(nombres)).all()
+                    for e in empresas:
+                        empresas_detalle.append({
+                            'nombre': e.nombre,
+                            'direccion': e.direccion or '-',
+                            'telefono': e.telefono or '-',
+                            'email': e.email or '-',
+                            'categoria': e.categoria or '-'
+                        })
+                # Si tampoco hay coincidencias, mostrar los nombres tal cual
+                if not empresas_detalle and nombres:
+                    for n in nombres:
+                        empresas_detalle.append({'nombre': n, 'direccion': '-', 'telefono': '-', 'email': '-', 'categoria': '-'})
 
             datos = [
                 ("Institución", visita.nombre_institucion),
@@ -855,7 +932,6 @@ def crear_itinerario():
                 ("Cantidad de alumnos", str(visita.cantidad_alumnos)),
                 ("Hora Grupo 1", hora1_formateada),
                 ("Hora Grupo 2", hora2_formateada),
-                ("Empresas a visitar", visita.empresas_seleccionadas),
                 ("Observaciones", visita.observaciones or "Ninguna"),
             ]
 
@@ -863,18 +939,41 @@ def crear_itinerario():
                 p.setFont("Helvetica-Bold", 12)
                 p.drawString(left_margin, y, f"{label}:")
                 p.setFont("Helvetica", 12)
-                p.drawString(left_margin + 130, y, str(value))
+                p.drawString(left_margin + 150, y, str(value))
                 y -= line_space
+
+            # Sección de empresas a visitar
+            if empresas_detalle:
+                y -= 10
+                p.setFont("Helvetica-Bold", 13)
+                p.setFillColorRGB(0.1, 0.2, 0.4)
+                p.drawString(left_margin, y, "Empresas a Visitar:")
+                y -= line_space
+                p.setFillColorRGB(0, 0, 0)
+                for emp in empresas_detalle:
+                    p.setFont("Helvetica-Bold", 12)
+                    p.drawString(left_margin + 10, y, f"• {emp['nombre']}")
+                    y -= line_space - 6
+                    p.setFont("Helvetica", 11)
+                    p.drawString(left_margin + 30, y, f"Dirección: {emp['direccion']}")
+                    y -= line_space - 10
+                    p.drawString(left_margin + 30, y, f"Teléfono: {emp['telefono']}   Email: {emp['email']}")
+                    y -= line_space - 10
+                    p.drawString(left_margin + 30, y, f"Categoría: {emp['categoria']}")
+                    y -= line_space
 
             # Línea separadora final
             p.setStrokeColorRGB(0.7, 0.7, 0.7)
             p.setLineWidth(1)
             p.line(left_margin, y + 10, width - right_margin, y + 10)
 
-            # Pie de página
+            # --- Pie de página ---
             p.setFont("Helvetica-Oblique", 10)
             p.setFillColorRGB(0.3, 0.3, 0.3)
-            p.drawCentredString(width / 2, bottom_margin, "Sistema de Gestión de Visitas - ITEC")
+            p.drawCentredString(width / 2, bottom_margin + 20, "Sistema de Gestión de Visitas Turísticas - Municipalidad de Esperanza")
+            p.setFont("Helvetica", 11)
+            p.setFillColorRGB(0, 0, 0)
+            p.drawString(left_margin, bottom_margin + 40, "Firma y Sello: ............................................................")
 
             p.save()
             
