@@ -1,335 +1,222 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solicitud de Visita Turística</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/nueva_visita.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/empresas.css') }}">
-</head>
-<body>
-    <div class="header">
-        <h1>📝 Formulario de Solicitud de Visita</h1>
-        <p>Complete todos los datos para registrar una nueva solicitud de visita turística</p>
+{% extends "index.html" %}
+
+{% block title %}Solicitud de Visita Turística{% endblock %}
+
+{% block header %}
+<div class="header-custom text-white px-4 py-3 d-flex flex-column align-items-center">
+    <h1 class="h3 mb-1 font-weight-bold">
+        <i class="fas fa-university mr-2"></i>
+        Sistema de Gestión de Visitas Turísticas
+    </h1>
+    <span class="lead font-weight-semibold">
+        Dirección de Turismo - Ciudad de Esperanza
+    </span>
+</div>
+{% endblock %}
+
+{% block content %}
+<!-- Información del proceso -->
+<div class="section">
+    <div class="info-panel">
+        <div class="info-item">
+            <strong>📋 Proceso de solicitud:</strong> 
+            1. Complete los datos → 2. Seleccione empresas → 3. Proponga fechas → 4. Envíe la solicitud
+        </div>
+        <div class="info-item">
+            <strong>🎯 Filtrado automático:</strong> 
+            Las empresas disponibles se mostrarán automáticamente según el tipo de institución y nivel educativo seleccionados.
+        </div>
+    </div>
+</div>
+
+<form action="/institucion/solicitar_visita" method="POST" class="form-solicitud">
+    <!-- A. DATOS DE LA INSTITUCIÓN -->
+    <div class="section">
+        <h2>A. Datos de la Institución</h2>
+        <div class="form-group">
+            <label for="nombre_institucion">Nombre completo de la institución educativa:</label>
+            <input type="text" id="nombre_institucion" name="nombre_institucion" required>
+        </div>
+        <div class="form-group">
+            <label for="localidad">Localidad:</label>
+            <input type="text" id="localidad" name="localidad" required>
+        </div>
+        <div class="form-group">
+            <label for="tipo_institucion">Tipo de institución:</label>
+            <select id="tipo_institucion" name="tipo_institucion" required>
+                <option value="">Seleccione una opción</option>
+                <option value="local">Institución Local (Esperanza)</option>
+                <option value="externa">Institución Externa (Turismo Educativo)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="director">Nombre del director/a:</label>
+            <input type="text" id="director" name="director" required>
+        </div>
+        <div class="form-group">
+            <label for="correo_institucional">Correo electrónico institucional:</label>
+            <input type="email" id="correo_institucional" name="correo_institucional" required>
+        </div>
+        <div class="form-group">
+            <label for="telefono_institucion">Número de teléfono de la institución:</label>
+            <input type="tel" id="telefono_institucion" name="telefono_institucion" required>
+        </div>
     </div>
 
-    <div class="container">
-        <!-- Información del proceso -->
-        <div class="section">
-            <div class="info-panel">
-                <div class="info-item">
-                    <strong>📋 Proceso de solicitud:</strong> 
-                    1. Complete los datos → 2. Seleccione empresas → 3. Proponga fechas → 4. Envíe la solicitud
-                </div>
-                <div class="info-item">
-                    <strong>🎯 Filtrado automático:</strong> 
-                    Las empresas disponibles se mostrarán automáticamente según el tipo de institución y nivel educativo seleccionados.
-                </div>
+    <!-- B. DATOS DEL CONTINGENTE -->
+    <div class="section">
+        <h2>B. Datos del Contingente</h2>
+        <div class="form-group">
+            <label for="contacto_principal">Nombre completo del contacto principal:</label>
+            <input type="text" id="contacto_principal" name="contacto_principal" required>
+        </div>
+        <div class="form-group">
+            <label for="telefono_contacto_principal">Número de teléfono del contacto principal:</label>
+            <input type="tel" id="telefono_contacto_principal" name="telefono_contacto_principal" required>
+        </div>
+        <div class="form-group">
+            <label for="relacion_contacto">Relación del contacto principal con el grupo:</label>
+            <input type="text" id="relacion_contacto" name="relacion_contacto" required>
+        </div>
+        <div class="form-group">
+            <label for="contacto_suplente">Nombre completo del contacto suplente:</label>
+            <input type="text" id="contacto_suplente" name="contacto_suplente">
+        </div>
+        <div class="form-group">
+            <label for="telefono_contacto_suplente">Número de teléfono del contacto suplente:</label>
+            <input type="tel" id="telefono_contacto_suplente" name="telefono_contacto_suplente">
+        </div>
+        <div class="form-group">
+            <label for="nivel_educativo">Nivel educativo del grupo:</label>
+            <select id="nivel_educativo" name="nivel_educativo" required>
+                <option value="">Seleccione el nivel educativo</option>
+                <option value="Primario">Nivel Primario</option>
+                <option value="Secundario">Nivel Secundario</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="cantidad_alumnos">Cantidad total de alumnos:</label>
+            <input type="number" id="cantidad_alumnos" name="cantidad_alumnos" required>
+        </div>
+        <div class="form-group">
+            <label for="edad_alumnos">Edad o rango etario de los alumnos:</label>
+            <input type="text" id="edad_alumnos" name="edad_alumnos" required>
+        </div>
+        <div class="form-group">
+            <label>¿Hay alumnos/as con discapacidad?</label>
+            <div>
+                <input type="radio" id="discapacidad_si" name="discapacidad" value="Sí" required>
+                <label for="discapacidad_si">Sí</label>
+                <input type="radio" id="discapacidad_no" name="discapacidad" value="No" required>
+                <label for="discapacidad_no">No</label>
             </div>
         </div>
-
-        <form action="/institucion/solicitar_visita" method="POST" class="form-solicitud">
-            <!-- A. DATOS DE LA INSTITUCIÓN -->
-            <div class="section">
-                <h2>A. Datos de la Institución</h2>
-                <div class="form-group">
-                    <label for="nombre_institucion">Nombre completo de la institución educativa:</label>
-                    <input type="text" id="nombre_institucion" name="nombre_institucion" required>
-                </div>
-                <div class="form-group">
-                    <label for="localidad">Localidad:</label>
-                    <input type="text" id="localidad" name="localidad" required>
-                </div>
-                
-                <!-- Nuevo campo para tipo de institución -->
-                <div class="form-group">
-                    <label for="tipo_institucion">Tipo de institución:</label>
-                    <select id="tipo_institucion" name="tipo_institucion" required>
-                        <option value="">Seleccione una opción</option>
-                        <option value="local">Institución Local (Esperanza)</option>
-                        <option value="externa">Institución Externa (Turismo Educativo)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="director">Nombre del director/a:</label>
-                    <input type="text" id="director" name="director" required>
-                </div>
-                <div class="form-group">
-                    <label for="correo_institucional">Correo electrónico institucional:</label>
-                    <input type="email" id="correo_institucional" name="correo_institucional" required>
-                </div>
-                <div class="form-group">
-                    <label for="telefono_institucion">Número de teléfono de la institución:</label>
-                    <input type="tel" id="telefono_institucion" name="telefono_institucion" required>
-                </div>
+        <div class="form-group">
+            <label for="tipo_discapacidad">Tipo de discapacidad (si aplica):</label>
+            <input type="text" id="tipo_discapacidad" name="tipo_discapacidad">
+        </div>
+        <div class="form-group">
+            <label>¿Requiere adaptación?</label>
+            <div>
+                <input type="radio" id="adaptacion_si" name="adaptacion" value="Sí">
+                <label for="adaptacion_si">Sí</label>
+                <input type="radio" id="adaptacion_no" name="adaptacion" value="No">
+                <label for="adaptacion_no">No</label>
             </div>
+        </div>
+    </div>
 
-            <!-- B. DATOS DEL CONTINGENTE -->
-            <div class="section">
-                <h2>B. Datos del Contingente</h2>
-                <div class="form-group">
-                    <label for="contacto_principal">Nombre completo del contacto principal:</label>
-                    <input type="text" id="contacto_principal" name="contacto_principal" required>
-                </div>
-                <div class="form-group">
-                    <label for="telefono_contacto_principal">Número de teléfono del contacto principal:</label>
-                    <input type="tel" id="telefono_contacto_principal" name="telefono_contacto_principal" required>
-                </div>
-                <div class="form-group">
-                    <label for="relacion_contacto">Relación del contacto principal con el grupo:</label>
-                    <input type="text" id="relacion_contacto" name="relacion_contacto" required>
-                </div>
-                <div class="form-group">
-                    <label for="contacto_suplente">Nombre completo del contacto suplente:</label>
-                    <input type="text" id="contacto_suplente" name="contacto_suplente">
-                </div>
-                <div class="form-group">
-                    <label for="telefono_contacto_suplente">Número de teléfono del contacto suplente:</label>
-                    <input type="tel" id="telefono_contacto_suplente" name="telefono_contacto_suplente">
-                </div>
-                <div class="form-group">
-                    <label for="nivel_educativo">Nivel educativo del grupo:</label>
-                    <select id="nivel_educativo" name="nivel_educativo" required>
-                        <option value="">Seleccione el nivel educativo</option>
-                        <option value="Primario">Nivel Primario</option>
-                        <option value="Secundario">Nivel Secundario</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="cantidad_alumnos">Cantidad total de alumnos:</label>
-                    <input type="number" id="cantidad_alumnos" name="cantidad_alumnos" required>
-                </div>
-                <div class="form-group">
-                    <label for="edad_alumnos">Edad o rango etario de los alumnos:</label>
-                    <input type="text" id="edad_alumnos" name="edad_alumnos" required>
-                </div>
-                <div class="form-group">
-                    <label>¿Hay alumnos/as con discapacidad?</label>
-                    <div>
-                        <input type="radio" id="discapacidad_si" name="discapacidad" value="Sí" required>
-                        <label for="discapacidad_si">Sí</label>
-                        <input type="radio" id="discapacidad_no" name="discapacidad" value="No" required>
-                        <label for="discapacidad_no">No</label>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="tipo_discapacidad">Tipo de discapacidad (si aplica):</label>
-                    <input type="text" id="tipo_discapacidad" name="tipo_discapacidad">
-                </div>
-                <div class="form-group">
-                    <label>¿Requiere adaptación?</label>
-                    <div>
-                        <input type="radio" id="adaptacion_si" name="adaptacion" value="Sí">
-                        <label for="adaptacion_si">Sí</label>
-                        <input type="radio" id="adaptacion_no" name="adaptacion" value="No">
-                        <label for="adaptacion_no">No</label>
-                    </div>
-                </div>
-            </div>
-
-            <!-- C. SELECCIÓN DE EMPRESAS A VISITAR -->
-            <div class="section">
-                <h2>C. Selección de Empresas a Visitar</h2>
-                {% if empresas %}
-                    <p>📝 Seleccione las empresas que desea visitar:</p>
-                    <div class="lugares-container" id="empresas-container">
-                        {% for empresa in empresas %}
-                        <div class="lugar-item">
-                            <input type="checkbox" id="empresa_{{ empresa.id }}" name="empresas_seleccionadas" value="{{ empresa.id }}">
-                            <label for="empresa_{{ empresa.id }}" class="lugar-label">
-                                <div class="lugar-info">
-                                    <h4>🏢 {{ empresa.nombre }}</h4>
-                                    <p class="categoria">📂 {{ empresa.categoria }}</p>
-                                    <p class="contacto">📧 {{ empresa.email }}</p>
-                                    <p class="contacto">📞 {{ empresa.telefono }}</p>
-                                </div>
-                            </label>
+    <!-- C. SELECCIÓN DE EMPRESAS A VISITAR -->
+    <div class="section">
+        <h2>C. Selección de Empresas a Visitar</h2>
+        {% if empresas %}
+            <p>📝 Seleccione las empresas que desea visitar:</p>
+            <div class="lugares-container" id="empresas-container">
+                {% for empresa in empresas %}
+                <div class="lugar-item">
+                    <input type="checkbox" id="empresa_{{ empresa.id }}" name="empresas_seleccionadas" value="{{ empresa.id }}">
+                    <label for="empresa_{{ empresa.id }}" class="lugar-label">
+                        <div class="lugar-info">
+                            <h4>🏢 {{ empresa.nombre }}</h4>
+                            <p class="categoria">📂 {{ empresa.categoria }}</p>
+                            <p class="contacto">📧 {{ empresa.email }}</p>
+                            <p class="contacto">📞 {{ empresa.telefono }}</p>
                         </div>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    <div class="info-panel warning">
-                        <p>⚠️ No hay empresas registradas aún.</p>
-                        <p>Primero debe <a href="/gestionar_empresas" target="_blank">registrar empresas</a> para poder solicitar visitas.</p>
-                    </div>
-                {% endif %}
-                <div class="form-group">
-                    <label for="observaciones_empresas">Observaciones adicionales sobre las empresas seleccionadas:</label>
-                    <textarea id="observaciones_empresas" name="observaciones_empresas" rows="3" placeholder="Ej: Interés especial en el área de producción, horarios preferidos, etc."></textarea>
+                    </label>
                 </div>
+                {% endfor %}
             </div>
-
-            <!-- D. FECHA Y HORARIO PROPUESTO -->
-            <div class="section">
-                <h2>D. Fecha y Horario Propuesto</h2>
-                <p>Indique la fecha y el horario sugerido para la visita:</p>
-                <div class="form-group">
-                    <label for="fecha_visita">Fecha sugerida de la visita:</label>
-                    <input type="date" id="fecha_visita" name="fecha_visita" required>
-                </div>
-                <div class="form-group">
-                    <label for="hora_grupo1">Hora propuesta para el grupo 1:</label>
-                    <input type="time" id="hora_grupo1" name="hora_grupo1">
-                </div>
-                <div class="form-group">
-                    <label for="hora_grupo2">Hora propuesta para el grupo 2:</label>
-                    <input type="time" id="hora_grupo2" name="hora_grupo2">
-                </div>
-                <div class="form-group">
-                    <label for="observaciones">Observaciones adicionales:</label>
-                    <textarea id="observaciones" name="observaciones" placeholder="Escriba aquí cualquier detalle adicional..."></textarea>
-                </div>
+        {% else %}
+            <div class="info-panel warning">
+                <p>⚠️ No hay empresas registradas aún.</p>
+                <p>Primero debe <a href="/gestionar_empresas" target="_blank">registrar empresas</a> para poder solicitar visitas.</p>
             </div>
-
-            <!-- Botón Final -->
-            <div class="botones">
-                <button type="submit" class="boton-enviar">
-                    📨 Enviar Solicitud
-                </button>
-                <a href="{{ url_for('index') }}" class="boton-volver">
-                    🏠 Volver al Menú
-                </a>
-            </div>
-        </form>
-
-        <!-- Información adicional -->
-        <div class="section">
-            <h2>ℹ️ Información Importante</h2>
-            <div class="info-panel">
-                <div class="info-item">
-                    <strong>⏰ Tiempo de respuesta:</strong> 
-                    Su solicitud será procesada en un plazo de 48-72 horas hábiles.
-                </div>
-                <div class="info-item">
-                    <strong>📞 Contacto:</strong> 
-                    Para consultas urgentes, comuníquese con la Dirección de Turismo de Esperanza.
-                </div>
-                <div class="info-item">
-                    <strong>📚 Niveles admitidos:</strong> 
-                    El sistema está configurado para instituciones de nivel Primario y Secundario únicamente.
-                </div>
-            </div>
+        {% endif %}
+        <div class="form-group">
+            <label for="observaciones_empresas">Observaciones adicionales sobre las empresas seleccionadas:</label>
+            <textarea id="observaciones_empresas" name="observaciones_empresas" rows="3" placeholder="Ej: Interés especial en el área de producción, horarios preferidos, etc."></textarea>
         </div>
     </div>
-    
-    <!-- Estilos específicos para nueva visita -->
-    <style>
-        .header p {
-            margin: 10px 0 0 0;
-            font-size: 1.1em;
-            opacity: 0.9;
-            font-weight: 300;
-        }
 
-        .form-group label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #005f73;
-        }
+    <!-- D. FECHA Y HORARIO PROPUESTO -->
+    <div class="section">
+        <h2>D. Fecha y Horario Propuesto</h2>
+        <p>Indique la fecha y el horario sugerido para la visita:</p>
+        <div class="form-group">
+            <label for="fecha_visita">Fecha sugerida de la visita:</label>
+            <input type="date" id="fecha_visita" name="fecha_visita" required>
+        </div>
+        <div class="form-group">
+            <label for="hora_grupo1">Hora propuesta para el grupo 1:</label>
+            <input type="time" id="hora_grupo1" name="hora_grupo1">
+        </div>
+        <div class="form-group">
+            <label for="hora_grupo2">Hora propuesta para el grupo 2:</label>
+            <input type="time" id="hora_grupo2" name="hora_grupo2">
+        </div>
+        <div class="form-group">
+            <label for="observaciones">Observaciones adicionales:</label>
+            <textarea id="observaciones" name="observaciones" placeholder="Escriba aquí cualquier detalle adicional..."></textarea>
+        </div>
+    </div>
 
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            font-size: 1em;
-            transition: all 0.3s ease;
-            background-color: #ffffff;
-        }
+    <!-- Botón Final -->
+    <div class="botones">
+        <button type="submit" class="boton-enviar">
+            📨 Enviar Solicitud
+        </button>
+        <a href="{{ url_for('index') }}" class="boton-volver">
+            🏠 Volver al Menú
+        </a>
+    </div>
+</form>
 
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #005f73;
-            box-shadow: 0 0 0 3px rgba(0, 95, 115, 0.1);
-            transform: translateY(-1px);
-        }
+<!-- Información adicional -->
+<div class="section">
+    <h2>ℹ️ Información Importante</h2>
+    <div class="info-panel">
+        <div class="info-item">
+            <strong>⏰ Tiempo de respuesta:</strong> 
+            Su solicitud será procesada en un plazo de 48-72 horas hábiles.
+        </div>
+        <div class="info-item">
+            <strong>📞 Contacto:</strong> 
+            Para consultas urgentes, comuníquese con la Dirección de Turismo de Esperanza.
+        </div>
+        <div class="info-item">
+            <strong>📚 Niveles admitidos:</strong> 
+            El sistema está configurado para instituciones de nivel Primario y Secundario únicamente.
+        </div>
+    </div>
+</div>
+{% endblock %}
 
-        .form-group input[type="radio"],
-        .form-group input[type="checkbox"] {
-            width: auto;
-            margin-right: 8px;
-            transform: scale(1.2);
-            accent-color: #005f73;
-        }
+{% block extra_css %}
+<style>
+    /* ...tu CSS específico de la página aquí... */
+</style>
+{% endblock %}
 
-        .botones {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-top: 30px;
-            flex-wrap: wrap;
-        }
-
-        .boton-enviar, .boton-volver {
-            padding: 15px 30px;
-            border: none;
-            border-radius: 10px;
-            font-size: 1.1em;
-            font-weight: 600;
-            text-decoration: none;
-            text-align: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .boton-enviar {
-            background: linear-gradient(135deg, #28a745, #20c997);
-            color: white;
-            border: 2px solid #28a745;
-        }
-
-        .boton-enviar:hover {
-            background: linear-gradient(135deg, #218838, #1abc9c);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
-        }
-
-        .boton-volver {
-            background: linear-gradient(135deg, #6c757d, #495057);
-            color: white;
-            border: 2px solid #6c757d;
-        }
-
-        .boton-volver:hover {
-            background: linear-gradient(135deg, #5a6268, #343a40);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(108, 117, 125, 0.3);
-        }
-
-        #cargando-empresas {
-            text-align: center;
-            padding: 20px;
-            font-style: italic;
-            color: #6c757d;
-            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-            border-radius: 8px;
-            border: 2px dashed #dee2e6;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .botones {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .boton-enviar, .boton-volver {
-                width: 100%;
-                max-width: 300px;
-            }
-        }
-    </style>
-    
-    <!-- Scripts JavaScript -->
-    <!-- <script src="{{ url_for('static', filename='js/filtro_empresas.js') }}"></script> -->
-    <script src="{{ url_for('static', filename='js/validaciones.js') }}"></script>
-</body>
-</html>
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/validaciones.js') }}"></script>
+{% endblock %}

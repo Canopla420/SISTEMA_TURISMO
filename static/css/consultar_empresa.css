@@ -8,14 +8,15 @@ body {
 }
 
 /* Encabezado */
-.header {
-    background-color: #0f2c4c;
-    color: white;
+.header-custom {
+    background: #0f2c4c !important;
+    color: #fff;
+    width: 100%;
+    margin-top: 0 !important;
+    margin-bottom: 4rem;
+    border-radius: 0 !important;
+    padding: 1.5rem 0;
     text-align: center;
-    padding: 20px;
-    font-size: 24px;
-    font-weight: bold;
-    margin: 0;
 }
 
 /* Contenedor principal */

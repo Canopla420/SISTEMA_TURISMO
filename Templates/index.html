@@ -3,88 +3,157 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Turismo - Esperanza</title>
+    <title>{% block title %}Sistema de Turismo - Esperanza{% endblock %}</title>
+    <!-- SB Admin 2 y FontAwesome -->
+    <link href="{{ url_for('static', filename='vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/sb-admin-2.min.css') }}" rel="stylesheet">
+    <!-- Tus estilos personalizados -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/nueva_visita.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/empresas.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/menu_grid.css') }}">
+    <style>
+        .header-custom {
+            border-radius: 0 !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            text-align: center;
+            background: #0f2c4c !important;
+            margin-top: 0;
+            margin-bottom: 2rem;
+            color: #ffffff;
+            width: 100%;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+        .sidebar {
+            background: #0f2c4c !important;
+            margin-top: 0;
+        }
+        body, .container, .container-fluid {
+            font-size: 0.97rem;
+        }
+        .sidebar .nav-link, .sidebar .sidebar-brand-text {
+            color: #f0f0f0 !important;
+        }
+        .sidebar .nav-link:hover {
+            background: #1f3853 !important;
+            color: #fff !important;
+        }
+        .sidebar .sidebar-brand {
+            background: #0f2c4c !important;
+        }
+        #content-wrapper {
+            min-height: 100vh;
+        }
+        .main-content-custom {
+            padding: 0;
+            margin-top: 0;
+        }
+        @media (max-width: 768px) {
+            .main-content-custom {
+                padding: 1rem;
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
 </head>
-<body>
-    <div class="header">
-        <h1>🏛️ Sistema de Gestión de Visitas Turísticas</h1>
-        <p>Dirección de Turismo - Ciudad de Esperanza</p>
+<body id="page-top">
+    <div id="wrapper">
+        <!-- Sidebar -->
+        <ul class="navbar-nav sidebar sidebar-dark accordion" id="accordionSidebar">
+            <hr class="sidebar-divider my-0">
+            <div style="height:6rem;"></div>
+            <!-- Accesos rápidos -->
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('solicitar_visita_institucion') }}">
+                    <i class="fas fa-clipboard-list"></i>
+                    <span>Cargar Visita</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('gestionar_empresas') }}">
+                    <i class="fas fa-building"></i>
+                    <span>Gestionar Empresas</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('consultar_empresas') }}">
+                    <i class="fas fa-search"></i>
+                    <span>Consultar Empresas</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('consultar_visitas') }}">
+                    <i class="fas fa-list"></i>
+                    <span>Consultar Visitas</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('crear_itinerario') }}">
+                    <i class="fas fa-route"></i>
+                    <span>Crear Itinerario</span>
+                </a>
+            </li>
+        </ul>
+        <!-- End of Sidebar -->
+
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+            <div id="content" class="main-content-custom">
+                {% block header %}
+                <div class="header-custom text-white px-4 py-3 d-flex flex-column align-items-center">
+                    <h1 class="h3 mb-1 font-weight-bold">
+                        <i class="fas fa-university mr-2"></i>
+                        Sistema de Gestión de Visitas Turísticas
+                    </h1>
+                    <span class="lead font-weight-semibold">
+                        Dirección de Turismo - Ciudad de Esperanza
+                    </span>
+                </div>
+                {% endblock %}
+                <div class="container">
+                    {% block content %}
+                    <!-- Sección de bienvenida -->
+                    <div class="section">
+                        <h2>🎉 Bienvenido al Sistema</h2>
+                        <div class="info-panel">
+                            <div class="info-item">
+                                <strong>🎯 Misión:</strong> 
+                                Facilitar la gestión de visitas turísticas para instituciones educativas de nivel Primario y Secundario.
+                            </div>
+                            <div class="info-item">
+                                <strong>🏛️ Turismo de Identidad:</strong> 
+                                Visitas para instituciones locales de Esperanza que buscan conocer su patrimonio cultural.
+                            </div>
+                            <div class="info-item">
+                                <strong>🎓 Turismo Educativo:</strong> 
+                                Visitas para instituciones externas que desean conocer nuestra región con fines educativos.
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Información del sistema -->
+                    <div class="section">
+                        <h2>ℹ️ Información del Sistema</h2>
+                        <div class="sistema-info">
+                            <div class="info-card">
+                                <strong>📚 Niveles Educativos:</strong>
+                                <p>El sistema está configurado específicamente para manejar instituciones de nivel Primario y Secundario según las especificaciones de la Dirección de Turismo de Esperanza.</p>
+                            </div>
+                            <div class="info-card">
+                                <strong>🔄 Proceso de Visita:</strong>
+                                <p>1. Registrar solicitud → 2. Seleccionar empresas → 3. Confirmar fechas → 4. Generar itinerario</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
     </div>
-
-    <div class="container">
-        <!-- Sección de bienvenida -->
-        <div class="section">
-            <h2>🎉 Bienvenido al Sistema</h2>
-            <div class="info-panel">
-                <div class="info-item">
-                    <strong>🎯 Misión:</strong> 
-                    Facilitar la gestión de visitas turísticas para instituciones educativas de nivel Primario y Secundario.
-                </div>
-                <div class="info-item">
-                    <strong>🏛️ Turismo de Identidad:</strong> 
-                    Visitas para instituciones locales de Esperanza que buscan conocer su patrimonio cultural.
-                </div>
-                <div class="info-item">
-                    <strong>🎓 Turismo Educativo:</strong> 
-                    Visitas para instituciones externas que desean conocer nuestra región con fines educativos.
-                </div>
-            </div>
-        </div>
-
-        <!-- Sección de estadísticas rápidas -->
-        <div class="section">
-            <h2>📊 Acceso Rápido</h2>
-            <div class="menu-grid">
-                <a href="{{ url_for('solicitar_visita_institucion') }}" class="menu-card nueva-visita">
-                    <div class="menu-icon">📝</div>
-                    <div class="menu-title">Cargar Nueva Visita</div>
-                    <div class="menu-description">Registrar solicitud de visita turística</div>
-                </a>
-                
-                <a href="{{ url_for('gestionar_empresas') }}" class="menu-card gestionar">
-                    <div class="menu-icon">🏢</div>
-                    <div class="menu-title">Gestionar Empresas</div>
-                    <div class="menu-description">Administrar empresas turísticas</div>
-                </a>
-                
-                <a href="{{ url_for('consultar_empresas') }}" class="menu-card consultar">
-                    <div class="menu-icon">🔍</div>
-                    <div class="menu-title">Consultar Empresas</div>
-                    <div class="menu-description">Ver listado de empresas disponibles</div>
-                </a>
-                
-                <a href="{{ url_for('consultar_visitas') }}" class="menu-card visitas">
-                    <div class="menu-icon">📋</div>
-                    <div class="menu-title">Consultar Visitas</div>
-                    <div class="menu-description">Ver, modificar y eliminar visitas</div>
-                </a>
-                
-                <a href="{{ url_for('crear_itinerario') }}" class="menu-card itinerario">
-                    <div class="menu-icon">🗺️</div>
-                    <div class="menu-title">Crear Itinerario</div>
-                    <div class="menu-description">Planificar rutas turísticas</div>
-                </a>
-            </div>
-        </div>
-
-        <!-- Información del sistema -->
-        <div class="section">
-            <h2>ℹ️ Información del Sistema</h2>
-            <div class="sistema-info">
-                <div class="info-card">
-                    <strong>📚 Niveles Educativos:</strong>
-                    <p>El sistema está configurado específicamente para manejar instituciones de nivel Primario y Secundario según las especificaciones de la Dirección de Turismo de Esperanza.</p>
-                </div>
-                <div class="info-card">
-                    <strong>🔄 Proceso de Visita:</strong>
-                    <p>1. Registrar solicitud → 2. Seleccionar empresas → 3. Confirmar fechas → 4. Generar itinerario</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    <!-- Scripts necesarios para el sidebar -->
+    <script src="{{ url_for('static', filename='vendor/jquery/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/fontawesome-free/js/all.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/sb-admin-2.min.js') }}"></script>
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

@@ -1,4 +1,10 @@
 /* General */
+html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box;
+}
+
 body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   background-color: #f1efec;
@@ -8,13 +14,18 @@ body {
 }
 
 /* Encabezado */
-.header {
-  background-color: #0f2c4c;
-  color: white;
-  text-align: center;
-  padding: 20px;
-  font-size: 24px;
-  font-weight: bold;
+.header-custom {
+    border-radius: 0 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    text-align: center;
+    background: #0f2c4c !important;
+    margin-top: 5;
+    margin-bottom: 4rem;
+    color: #fff;
+    width: 100%;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-top: 0.75rem; /* o el valor que prefieras */
 }
 
 /* Contenedor principal */
