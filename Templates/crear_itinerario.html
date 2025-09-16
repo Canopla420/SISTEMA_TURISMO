@@ -1,18 +1,20 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crear Itinerario - Sistema de Gestión de Visitas</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/crear_itinerario.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
-<body>
-    <!-- Encabezado -->
-    <div class="header">
-        <i class="fas fa-route"></i>
-        Sistema de Gestión de Visitas - Crear Itinerario
-    </div>
+{% extends "index.html" %}
+
+{% block title %}Crear Itinerario{% endblock %}
+
+{% block header %}
+<div class="header-custom text-white px-4 py-3 d-flex flex-column align-items-center">
+    <h1 class="h3 mb-1 font-weight-bold">
+        <i class="fas fa-route mr-2"></i>
+        Crear Itinerario de Visita
+    </h1>
+    <span class="lead font-weight-semibold">
+        Dirección de Turismo - Ciudad de Esperanza
+    </span>
+</div>
+{% endblock %}
+
+{% block content %}
 
     <!-- Contenedor principal -->
     <div class="container">
@@ -78,5 +80,4 @@
             </a>
         </div>
     </div>
-</body>
-</html>
+{% endblock %}

@@ -8,52 +8,10 @@
     <link href="{{ url_for('static', filename='vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/sb-admin-2.min.css') }}" rel="stylesheet">
     <!-- Tus estilos personalizados -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/nueva_visita.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/empresas.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/menu_grid.css') }}">
-    <style>
-        .header-custom {
-            border-radius: 0 !important;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-            text-align: center;
-            background: #0f2c4c !important;
-            margin-top: 0;
-            margin-bottom: 2rem;
-            color: #ffffff;
-            width: 100%;
-            padding-left: 0 !important;
-            padding-right: 0 !important;
-        }
-        .sidebar {
-            background: #0f2c4c !important;
-            margin-top: 0;
-        }
-        body, .container, .container-fluid {
-            font-size: 0.97rem;
-        }
-        .sidebar .nav-link, .sidebar .sidebar-brand-text {
-            color: #f0f0f0 !important;
-        }
-        .sidebar .nav-link:hover {
-            background: #1f3853 !important;
-            color: #fff !important;
-        }
-        .sidebar .sidebar-brand {
-            background: #0f2c4c !important;
-        }
-        #content-wrapper {
-            min-height: 100vh;
-        }
-        .main-content-custom {
-            padding: 0;
-            margin-top: 0;
-        }
-        @media (max-width: 768px) {
-            .main-content-custom {
-                padding: 1rem;
-            }
-        }
-    </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body id="page-top">

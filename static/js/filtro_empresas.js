@@ -3,103 +3,68 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
-    const localidadInput = document.getElementById('localidad');
     const tipoInstitucionSelect = document.getElementById('tipo_institucion');
     const nivelEducativoSelect = document.getElementById('nivel_educativo');
     const empresasContainer = document.getElementById('empresas-container');
-    const cargandoEmpresasP = document.getElementById('cargando-empresas');
     
     console.log('🔧 Filtro de empresas inicializado');
-    console.log('📍 Elementos encontrados:', {
-        localidad: !!localidadInput,
-        tipoInstitucion: !!tipoInstitucionSelect,
-        nivelEducativo: !!nivelEducativoSelect,
-        empresasContainer: !!empresasContainer,
-        cargandoEmpresas: !!cargandoEmpresasP
-    });
     
-    // Función para determinar si la institución es de Esperanza
-    function esDeEsperanza() {
-        const tipoInstitucion = tipoInstitucionSelect ? tipoInstitucionSelect.value : '';
-        const localidad = localidadInput ? localidadInput.value.toLowerCase() : '';
-        
-        console.log('🔍 Determinando tipo de institución:', { tipoInstitucion, localidad });
-        
-        // Priorizar el campo tipo_institucion si existe y está seleccionado
-        if (tipoInstitucion === 'local') {
-            console.log('✅ Institución LOCAL detectada');
-            return true;
-        } else if (tipoInstitucion === 'externa') {
-            console.log('✅ Institución EXTERNA detectada');
-            return false;
-        }
-        
-        // Fallback: detectar por localidad
-        const esEsperanzaPorLocalidad = localidad.includes('esperanza');
-        console.log('🔍 Detección por localidad:', esEsperanzaPorLocalidad);
-        return esEsperanzaPorLocalidad;
-    }
-    
-    // Función para limpiar la lista de empresas
-    function limpiarListaEmpresas() {
-        if (empresasContainer) {
-            empresasContainer.innerHTML = '';
-        }
-    }
-    
-    // Función para cargar empresas filtradas
-    function cargarEmpresasFiltradas() {
-        console.log('🚀 Iniciando carga de empresas filtradas');
-        
-        const nivelEducativo = nivelEducativoSelect ? nivelEducativoSelect.value : '';
-        
-        console.log('📊 Parámetros de filtrado:', {
-            nivelEducativo: nivelEducativo,
-            tipoInstitucion: tipoInstitucionSelect ? tipoInstitucionSelect.value : '',
-            localidad: localidadInput ? localidadInput.value : ''
-        });
-        
-        if (!nivelEducativo) {
-            console.log('⚠️ Nivel educativo no seleccionado');
-            if (cargandoEmpresasP) {
-                cargandoEmpresasP.textContent = 'Seleccione el nivel educativo para ver las opciones disponibles.';
-                cargandoEmpresasP.style.display = 'block';
-            }
-            limpiarListaEmpresas();
-            return;
-        }
-        
-        const esEsperanza = esDeEsperanza();
-        
-        if (cargandoEmpresasP) {
-            cargandoEmpresasP.textContent = 'Cargando empresas disponibles...';
-            cargandoEmpresasP.style.display = 'block';
-        }
-        
-        // Construir URL con parámetros
-        const url = `/empresas_filtradas?es_de_esperanza=${esEsperanza}&nivel_educativo=${nivelEducativo}`;
-        console.log('🌐 Realizando petición a:', url);
-        
-        fetch(url)
-            .then(response => {
-                console.log('📡 Respuesta recibida:', response.status);
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(empresas => {
-                console.log('📋 Empresas recibidas:', empresas.length);
-                console.log('📄 Datos:', empresas);
-                actualizarListaEmpresas(empresas, esEsperanza, nivelEducativo);
-            })
-            .catch(error => {
-                console.error('❌ Error al cargar empresas:', error);
-                if (cargandoEmpresasP) {
-                    cargandoEmpresasP.textContent = 'Error al cargar las empresas. Intente nuevamente.';
-                    cargandoEmpresasP.style.display = 'block';
+    // Función para actualizar la visibilidad de las empresas
+    function actualizarEmpresas() {
+        const tipoInstitucion = tipoInstitucionSelect.value;
+        const nivelEducativo = nivelEducativoSelect.value;
+
+        console.log('� Actualizando empresas:', { tipoInstitucion, nivelEducativo });
+
+        // Si ambos campos están seleccionados
+        if (tipoInstitucion && nivelEducativo) {
+            empresasPlaceholder.style.display = 'none';
+            empresasSection.style.display = 'block';
+
+            // Obtener todas las empresas
+            const empresas = document.querySelectorAll('.lugar-item');
+            let empresasVisibles = false;
+
+            // Filtrar empresas según los criterios seleccionados
+            empresas.forEach(empresa => {
+                const empresaTipo = empresa.dataset.tipoInstitucion;
+                const empresaNivel = empresa.dataset.nivelEducativo;
+                
+                console.log('Evaluando empresa:', {
+                    tipo: empresaTipo,
+                    nivel: empresaNivel,
+                    coincideTipo: empresaTipo === tipoInstitucion || empresaTipo === 'ambos',
+                    coincideNivel: empresaNivel === nivelEducativo || empresaNivel === 'ambos'
+                });
+
+                // Mostrar solo las empresas que coinciden con ambos criterios
+                if (
+                    (empresaTipo === tipoInstitucion || empresaTipo === 'ambos') &&
+                    (empresaNivel === nivelEducativo || empresaNivel === 'ambos')
+                ) {
+                    empresa.style.display = 'block';
+                    empresasVisibles = true;
+                } else {
+                    empresa.style.display = 'none';
+                    // Desmarcar el checkbox si la empresa está oculta
+                    const checkbox = empresa.querySelector('input[type="checkbox"]');
+                    if (checkbox) checkbox.checked = false;
                 }
             });
+
+            // Mostrar mensaje si no hay empresas disponibles
+            if (!empresasVisibles) {
+                empresasSection.innerHTML = `
+                    <div class="info-panel warning">
+                        <p>⚠️ No hay empresas disponibles para el tipo de institución y nivel educativo seleccionados.</p>
+                    </div>
+                `;
+            }
+        } else {
+            // Si falta algún campo, mostrar el placeholder
+            empresasPlaceholder.style.display = 'block';
+            empresasSection.style.display = 'none';
+        }
     }
     
     // Función para actualizar la lista de empresas en el DOM
@@ -185,28 +150,12 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('✅ DOM actualizado correctamente');
     }
     
-    // Event listeners
-    if (tipoInstitucionSelect) {
-        tipoInstitucionSelect.addEventListener('change', function() {
-            console.log('🔄 Cambio en tipo de institución:', this.value);
-            cargarEmpresasFiltradas();
-        });
-    }
-    
-    if (localidadInput) {
-        localidadInput.addEventListener('input', function() {
-            console.log('🔄 Cambio en localidad:', this.value);
-            clearTimeout(this.debounceTimer);
-            this.debounceTimer = setTimeout(cargarEmpresasFiltradas, 500);
-        });
-    }
-    
-    if (nivelEducativoSelect) {
-        nivelEducativoSelect.addEventListener('change', function() {
-            console.log('🔄 Cambio en nivel educativo:', this.value);
-            cargarEmpresasFiltradas();
-        });
-    }
+    // Escuchar cambios en los selectores
+    tipoInstitucionSelect.addEventListener('change', actualizarEmpresas);
+    nivelEducativoSelect.addEventListener('change', actualizarEmpresas);
+
+    // Inicializar el estado
+    actualizarEmpresas();
     
     console.log('✅ Event listeners configurados');
 });

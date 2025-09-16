@@ -1,16 +1,23 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Confirmación de Visita</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/confirmacion_carga_visita.css') }}">
-</head>
-<body>
-    <div class="container">
+{% extends "index.html" %}
+
+{% block title %}Confirmación de Visita{% endblock %}
+
+{% block header %}
+<div class="header-custom text-white px-4 py-3 d-flex flex-column align-items-center">
+    <h1 class="h3 mb-1 font-weight-bold">
+        <i class="fas fa-check-circle mr-2"></i>
+        Confirmación de Solicitud
+    </h1>
+    <span class="lead font-weight-semibold">
+        Dirección de Turismo - Ciudad de Esperanza
+    </span>
+</div>
+{% endblock %}
+
+{% block content %}
+    <div class="section">
         <h1>¡Solicitud enviada con éxito!</h1>
         <p>Gracias por enviar su solicitud de visita. Nos pondremos en contacto con usted pronto.</p>
         <a href="{{ url_for('index') }}">Volver al inicio</a>
     </div>
-</body>
-</html>
+{% endblock %}

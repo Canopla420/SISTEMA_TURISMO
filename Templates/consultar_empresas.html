@@ -1,23 +1,20 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consultar Empresas Turísticas</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/nueva_visita.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/empresas.css') }}">
-</head>
-<body>
-    <div class="header-custom text-white px-4 py-3 d-flex flex-column align-items-center">
-        <h1 class="h3 mb-1 font-weight-bold">
-            <i class="fas fa-building mr-2"></i>
-            Gestión de Empresas Turísticas
-        </h1>
-        <span class="lead font-weight-semibold">
-            Dirección de Turismo - Ciudad de Esperanza
-        </span>
-    </div>
-    <div class="container">
+{% extends "index.html" %}
+
+{% block title %}Consultar Empresas Turísticas{% endblock %}
+
+{% block header %}
+<div class="header-custom text-white px-4 py-3 d-flex flex-column align-items-center">
+    <h1 class="h3 mb-1 font-weight-bold">
+        <i class="fas fa-building mr-2"></i>
+        Gestión de Empresas Turísticas
+    </h1>
+    <span class="lead font-weight-semibold">
+        Dirección de Turismo - Ciudad de Esperanza
+    </span>
+</div>
+{% endblock %}
+
+{% block content %}
         <!-- Información del proceso -->
         <div class="section">
             <div class="info-panel" style="background: #f1f5f9; border-left: 6px solid #005f73; padding: 18px 24px; border-radius: 12px; margin-bottom: 18px;">
@@ -256,11 +253,13 @@
         }
     </style>
 
-    <!-- Scripts JavaScript -->
-    <script src="{{ url_for('static', filename='js/validaciones.js') }}"></script>
-    <script>
-        // JavaScript para autocompletar el correo cuando se selecciona una empresa
-        document.addEventListener('DOMContentLoaded', function() {
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/validaciones.js') }}"></script>
+<script>
+    // JavaScript para autocompletar el correo cuando se selecciona una empresa
+    document.addEventListener('DOMContentLoaded', function() {
             const empresaInput = document.getElementById('empresa');
             const correoInput = document.getElementById('correo');
             
@@ -372,5 +371,4 @@
             });
         });
     </script>
-</body>
-</html>
+{% endblock %}

@@ -93,6 +93,8 @@ class EmpresaTuristica(db.Model):
     categoria = db.Column(db.String(50), nullable=False)
     capacidad_maxima = db.Column(db.Integer, nullable=True)
     duracion_visita = db.Column(db.String(50), nullable=True)
+    # Temporalmente comentado hasta actualizar la base de datos
+    # nivel_educativo_objetivo = db.Column(db.String(20), nullable=True)  # 'Primario', 'Secundario', o 'Ambos'
     fecha_creacion = db.Column(db.DateTime, default=datetime.utcnow)
 
 class ConsultaEmpresa(db.Model):

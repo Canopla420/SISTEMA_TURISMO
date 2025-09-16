@@ -129,11 +129,16 @@
     <!-- C. SELECCIÓN DE EMPRESAS A VISITAR -->
     <div class="section">
         <h2>C. Selección de Empresas a Visitar</h2>
-        {% if empresas %}
+        <div id="empresas-placeholder" class="info-panel">
+            <p>⏳ Por favor, complete el tipo de institución y nivel educativo para ver las empresas disponibles.</p>
+        </div>
+        <div id="empresas-section" style="display: none;">
             <p>📝 Seleccione las empresas que desea visitar:</p>
             <div class="lugares-container" id="empresas-container">
                 {% for empresa in empresas %}
-                <div class="lugar-item">
+                <div class="lugar-item" 
+                     data-tipo-institucion="{{ empresa.tipo_institucion }}" 
+                     data-nivel-educativo="{{ empresa.nivel_educativo }}">
                     <input type="checkbox" id="empresa_{{ empresa.id }}" name="empresas_seleccionadas" value="{{ empresa.id }}">
                     <label for="empresa_{{ empresa.id }}" class="lugar-label">
                         <div class="lugar-info">
@@ -146,7 +151,8 @@
                 </div>
                 {% endfor %}
             </div>
-        {% else %}
+        </div>
+        {% if not empresas %}
             <div class="info-panel warning">
                 <p>⚠️ No hay empresas registradas aún.</p>
                 <p>Primero debe <a href="/gestionar_empresas" target="_blank">registrar empresas</a> para poder solicitar visitas.</p>
@@ -219,4 +225,5 @@
 
 {% block extra_js %}
 <script src="{{ url_for('static', filename='js/validaciones.js') }}"></script>
+<script src="{{ url_for('static', filename='js/filtro_empresas_nuevo.js') }}"></script>
 {% endblock %}

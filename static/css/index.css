@@ -1,21 +1,79 @@
 /* General */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #F1EFEC; /* Fondo claro */
+    background-color: #F1EFEC;
     margin: 0;
     padding: 0;
     color: #333;
+    font-size: 0.97rem;
 }
 
-/* Encabezado */
-.header {
-    background-color: #0f2c4c;
-    color: white;
+/* Header y Sidebar */
+.header-custom {
+    border-radius: 0 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     text-align: center;
-    padding: 20px;
-    font-size: 24px;
-    font-weight: bold;
+    background: #0f2c4c !important;
     margin: 0;
+    padding: 1.5rem 0;
+    color: #ffffff;
+    width: 100%;
+}
+
+#accordionSidebar {
+    background: #0f2c4c !important;
+    margin-top: 0;
+    position: fixed;
+    height: 100vh;
+    width: 225px;
+    z-index: 1000;
+}
+
+#accordionSidebar.sidebar {
+    background: #0f2c4c !important;
+}
+
+.sidebar-dark {
+    background: #0f2c4c !important;
+}
+
+#accordionSidebar .nav-link {
+    color: #f0f0f0 !important;
+    padding: 1rem 1rem;
+    font-size: 0.85rem;
+}
+
+#accordionSidebar .nav-link:hover {
+    background: #1f3853 !important;
+    color: #fff !important;
+}
+
+#accordionSidebar .nav-link i {
+    margin-right: 0.5rem;
+    font-size: 1rem;
+}
+
+/* Layout */
+#wrapper {
+    display: flex;
+}
+
+#content-wrapper {
+    min-height: 100vh;
+    margin-left: 225px; /* Mismo ancho que el sidebar */
+    width: calc(100% - 225px);
+}
+
+.main-content-custom {
+    padding: 0;
+    margin-top: 0;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .main-content-custom {
+        padding: 1rem;
+    }
 }
 
 /* Contenedor principal */

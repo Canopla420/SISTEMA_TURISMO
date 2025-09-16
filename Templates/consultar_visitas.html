@@ -1,219 +1,24 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consultar Visitas</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/nueva_visita.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/empresas.css') }}">
-    <!-- Estilos específicos para consultar visitas -->
-    <style>
-        /* Estilos para botones de acción */
-        .acciones-grupo {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: center;
-            padding: 8px 4px;
-        }
+{% extends "index.html" %}
 
-        .boton-accion {
-            padding: 6px 10px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            text-decoration: none;
-            font-size: 0.8em;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            white-space: nowrap;
-            min-width: 80px;
-            text-align: center;
-            line-height: 1.2;
-        }
+{% block title %}Consultar Visitas{% endblock %}
 
-        .boton-accion.editar {
-            background: linear-gradient(135deg, #007bff, #0056b3);
-            color: white;
-            border: 2px solid #007bff;
-        }
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/consultar_visitas.css') }}">
+{% endblock %}
 
-        .boton-accion.editar:hover {
-            background: linear-gradient(135deg, #0056b3, #004085);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
-        }
-
-        .boton-accion.eliminar {
-            background: linear-gradient(135deg, #dc3545, #c82333);
-            color: white;
-            border: 2px solid #dc3545;
-        }
-
-        .boton-accion.eliminar:hover {
-            background: linear-gradient(135deg, #c82333, #a71e2a);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
-        }
-
-        .boton-accion.confirmar {
-            background: linear-gradient(135deg, #28a745, #20c997);
-            color: white;
-            border: 2px solid #28a745;
-        }
-
-        .boton-accion.confirmar:hover {
-            background: linear-gradient(135deg, #218838, #1abc9c);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
-        }
-
-        .boton-accion.rechazar {
-            background: linear-gradient(135deg, #ffc107, #fd7e14);
-            color: white;
-            border: 2px solid #ffc107;
-        }
-
-        .boton-accion.rechazar:hover {
-            background: linear-gradient(135deg, #e0a800, #ef6f00);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
-        }
-
-        /* Ajustar el ancho de la columna de acciones */
-        .tabla-empresas th:last-child,
-        .tabla-empresas td:last-child {
-            width: 280px;
-            min-width: 280px;
-            text-align: center;
-        }
-
-        /* Estilos para formularios inline */
-        .acciones-grupo form {
-            margin: 0;
-            display: inline-block;
-        }
-
-        /* Asegurar que la tabla no se corte */
-        .tabla-container {
-            overflow-x: auto;
-            width: 100%;
-        }
-
-        .tabla-empresas {
-            width: 100%;
-            min-width: 1200px;
-        }
-
-        /* Mejorar estado badges */
-        .estado-badge {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            white-space: nowrap;
-        }
-
-        .estado-badge.activa {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .estado-badge.pendiente {
-            background-color: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeaa7;
-        }
-
-        .estado-badge.inactiva {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        /* Responsive para móviles */
-        @media (max-width: 768px) {
-            .tabla-empresas th:last-child,
-            .tabla-empresas td:last-child {
-                width: 200px;
-                min-width: 200px;
-            }
-
-            .acciones-grupo {
-                flex-direction: column;
-                gap: 4px;
-                padding: 6px 2px;
-            }
-
-            .acciones-grupo form {
-                width: 100%;
-                margin: 0;
-            }
-
-            .boton-accion {
-                width: 100%;
-                min-width: 100px;
-                font-size: 0.75em;
-                padding: 5px 8px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .tabla-container {
-                overflow-x: scroll;
-            }
-            
-            .tabla-empresas {
-                min-width: 900px;
-            }
-        }
-
-        /* Mejorar legibilidad de la tabla */
-        .tabla-empresas {
-            font-size: 0.9em;
-        }
-
-        .tabla-empresas td {
-            vertical-align: middle;
-            padding: 12px 8px;
-        }
-
-        .empresa-info strong {
-            display: block;
-            margin-bottom: 4px;
-        }
-
-        .empresa-info small {
-            color: #6c757d;
-            font-size: 0.85em;
-        }
-
-        .personas {
-            text-align: center;
-            font-weight: 600;
-            color: #005f73;
-        }
-    </style>
-</head>
-<body>
+{% block header %}
 <div class="header-custom text-white px-4 py-3 d-flex flex-column align-items-center">
     <h1 class="h3 mb-1 font-weight-bold">
-        <i class="fas fa-building mr-2"></i>
-        Gestión de Empresas Turísticas
+        <i class="fas fa-list mr-2"></i>
+        Consulta de Visitas Turísticas
     </h1>
     <span class="lead font-weight-semibold">
         Dirección de Turismo - Ciudad de Esperanza
     </span>
 </div>
+{% endblock %}
 
-    <div class="container">
+{% block content %}
         <!-- Formulario de búsqueda -->
         <div class="section">
             <h2>🔍 Buscar Visitas</h2>
@@ -380,6 +185,8 @@
         </div>
     </div>
     
+{% endblock %}
+
+{% block extra_js %}
     <script src="{{ url_for('static', filename='js/eliminar_visita.js') }}"></script>
-</body>
-</html>
+{% endblock %}

@@ -1,23 +1,25 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestionar Empresas Turísticas</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/nueva_visita.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/empresas.css') }}">
-</head>
-<body>
-    <div class="header-custom text-white px-4 py-3 d-flex flex-column align-items-center">
-        <h1 class="h3 mb-1 font-weight-bold">
-            <i class="fas fa-building mr-2"></i>
-            Gestión de Empresas Turísticas
-        </h1>
-        <span class="lead font-weight-semibold">
-            Dirección de Turismo - Ciudad de Esperanza
-        </span>
-    </div>
-    <div class="container">
+{% extends "index.html" %}
+
+{% block title %}Gestionar Empresas Turísticas{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/resumen_sistema.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/gestionar_empresas.css') }}">
+{% endblock %}
+
+{% block header %}
+<div class="header-custom text-white px-4 py-3 d-flex flex-column align-items-center">
+    <h1 class="h3 mb-1 font-weight-bold">
+        <i class="fas fa-building mr-2"></i>
+        Gestión de Empresas Turísticas
+    </h1>
+    <span class="lead font-weight-semibold">
+        Dirección de Turismo - Ciudad de Esperanza
+    </span>
+</div>
+{% endblock %}
+
+{% block content %}
         <!-- Sección de estadísticas -->
         <div class="section">
             <h2>📊 Resumen del Sistema</h2>
@@ -54,7 +56,7 @@
         <div class="section">
             <h2>📋 Listado de Empresas</h2>
             <div class="tabla-container">
-                <table class="tabla-empresas">                <table class="tabla-empresas">
+                <table class="tabla-empresas">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -147,265 +149,4 @@
         {% endif %}
     </div>
 
-    <!-- Estilos específicos para gestión de empresas -->
-    <style>
-        /* Estadísticas */
-        .estadisticas-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .stat-card {
-            background: linear-gradient(135deg, #ffffff, #f8f9fa);
-            border: 2px solid;
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-2px);
-        }
-
-        .stat-card.identidad { border-color: #28a745; }
-        .stat-card.educativo { border-color: #007bff; }
-        .stat-card.activas { border-color: #17a2b8; }
-        .stat-card.total { border-color: #6c757d; }
-
-        .stat-number {
-            font-size: 2.5em;
-            font-weight: bold;
-            color: #005f73;
-            line-height: 1;
-        }
-
-        .stat-label {
-            font-size: 0.9em;
-            color: #6c757d;
-            margin-top: 5px;
-            font-weight: 500;
-        }
-
-        /* Tabla */
-        .tabla-container {
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .tabla-empresas {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9em;
-        }
-
-        .tabla-empresas th {
-            background: linear-gradient(135deg, #0f2c4c, #005f73);
-            color: white;
-            padding: 15px 10px;
-            text-align: left;
-            font-weight: 600;
-            border-bottom: 3px solid #005f73;
-        }
-
-        .tabla-empresas td {
-            padding: 12px 10px;
-            border-bottom: 1px solid #e9ecef;
-            vertical-align: top;
-        }
-
-        .tabla-empresas tr:hover {
-            background-color: #f8f9fa;
-        }
-
-        .fila-inactiva {
-            opacity: 0.6;
-            background-color: #f8d7da !important;
-        }
-
-        /* Celdas específicas */
-        .id-celda {
-            font-weight: bold;
-            color: #6c757d;
-            text-align: center;
-            width: 60px;
-        }
-
-        .empresa-celda {
-            min-width: 200px;
-        }
-
-        .empresa-info strong {
-            display: block;
-            color: #005f73;
-            margin-bottom: 3px;
-        }
-
-        .empresa-info small {
-            color: #6c757d;
-            font-size: 0.8em;
-        }
-
-        .contacto-celda {
-            min-width: 180px;
-        }
-
-        .contacto-info span {
-            display: block;
-            margin-bottom: 3px;
-        }
-
-        .contacto-info small {
-            color: #6c757d;
-            font-size: 0.8em;
-        }
-
-        /* Badges */
-        .categoria-badge, .nivel-badge, .estado-badge {
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.8em;
-            font-weight: 600;
-            text-align: center;
-        }
-
-        .categoria-badge.identidad {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .categoria-badge.educativo {
-            background-color: #cce7ff;
-            color: #004085;
-            border: 1px solid #99d6ff;
-        }
-
-        .nivel-badge {
-            background-color: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeaa7;
-        }
-
-        .estado-badge.activa {
-            background-color: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
-        }
-
-        .estado-badge.inactiva {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        /* Acciones */
-        .acciones-grupo {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .boton-accion {
-            padding: 6px 12px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            text-decoration: none;
-            font-size: 0.8em;
-            font-weight: 500;
-            transition: all 0.2s ease;
-        }
-
-        .boton-accion.editar {
-            background-color: #007bff;
-            color: white;
-        }
-
-        .boton-accion.editar:hover {
-            background-color: #0056b3;
-            transform: translateY(-1px);
-        }
-
-        .boton-accion.eliminar {
-            background-color: #dc3545;
-            color: white;
-        }
-
-        .boton-accion.eliminar:hover {
-            background-color: #c82333;
-            transform: translateY(-1px);
-        }
-
-        .texto-desactivada {
-            color: #6c757d;
-            font-style: italic;
-            font-size: 0.8em;
-        }
-
-        /* Sin datos */
-        .sin-datos {
-            text-align: center;
-            padding: 40px;
-        }
-
-        .mensaje-vacio {
-            color: #6c757d;
-        }
-
-        .mensaje-vacio h3 {
-            color: #005f73;
-            margin-bottom: 10px;
-        }
-
-        /* Panel de información */
-        .info-panel {
-            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-            border-radius: 10px;
-            padding: 20px;
-            border-left: 5px solid #005f73;
-        }
-
-        .info-item {
-            margin-bottom: 10px;
-            padding: 8px 0;
-            border-bottom: 1px solid #dee2e6;
-        }
-
-        .info-item:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-        }
-
-        .info-item strong {
-            color: #005f73;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .estadisticas-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .tabla-empresas {
-                font-size: 0.8em;
-            }
-            
-            .tabla-empresas th,
-            .tabla-empresas td {
-                padding: 8px 6px;
-            }
-            
-            .acciones-grupo {
-                flex-direction: column;
-            }
-        }
-    </style>
-</body>
-</html>
+{% endblock %}

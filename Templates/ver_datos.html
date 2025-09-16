@@ -1,9 +1,8 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Turismo - Datos Almacenados</title>
+{% extends "index.html" %}
+
+{% block title %}Sistema de Turismo - Datos Almacenados{% endblock %}
+
+{% block extra_css %}
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -156,10 +155,23 @@
             color: #6c757d;
         }
     </style>
-</head>
-<body>
+</style>
+{% endblock %}
+
+{% block header %}
+<div class="header-custom text-white px-4 py-3 d-flex flex-column align-items-center">
+    <h1 class="h3 mb-1 font-weight-bold">
+        <i class="fas fa-database mr-2"></i>
+        Sistema de Turismo - Base de Datos
+    </h1>
+    <span class="lead font-weight-semibold">
+        Dirección de Turismo - Ciudad de Esperanza
+    </span>
+</div>
+{% endblock %}
+
+{% block content %}
     <div class="container">
-        <h1>🏛️ Sistema de Turismo - Base de Datos</h1>
         
         <div class="actions">
             <a href="/" class="btn">🏠 Volver al Inicio</a>
@@ -376,5 +388,16 @@
             location.reload();
         }, 30000);
     </script>
-</body>
-</html>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Mostrar timestamp actual
+    document.getElementById('timestamp').textContent = new Date().toLocaleString('es-AR');
+    
+    // Auto-refresh cada 30 segundos
+    setTimeout(() => {
+        location.reload();
+    }, 30000);
+</script>
+{% endblock %}
