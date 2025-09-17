@@ -1,0 +1,117 @@
+/* Estilos para el formulario de edición */
+.form-section {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    margin: 20px auto;
+    max-width: 800px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.subtitle {
+    color: #6c757d;
+    margin-bottom: 20px;
+    font-size: 0.95em;
+}
+
+.section {
+    margin-bottom: 30px;
+}
+
+.section h2 {
+    color: #0f2c4c;
+    font-size: 1.5em;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #495057;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 0.95em;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #0f2c4c;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(15, 44, 76, 0.25);
+}
+
+.form-group textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.botones {
+    display: flex;
+    justify-content: center;  /* Centrar los botones */
+    margin-top: 40px;
+    gap: 100px;  /* Espacio grande entre botones */
+    width: 100%;
+}
+
+.boton-enviar,
+.boton-volver {
+    min-width: 200px;  /* Ancho mínimo para los botones */
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.95em;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;  /* Centrar contenido del botón */
+    transition: all 0.3s ease;
+}
+
+.boton-enviar {
+    background: #0f2c4c;
+    color: white;
+}
+
+.boton-volver {
+    background: #6c757d;
+    color: white;
+}
+
+.boton-enviar:hover,
+.boton-volver:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .form-section {
+        margin: 10px;
+    }
+
+    .botones {
+        flex-direction: column;
+    }
+    
+    .boton-enviar,
+    .boton-volver {
+        width: 100%;
+        justify-content: center;
+    }
+}

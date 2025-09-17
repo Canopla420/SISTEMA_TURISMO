@@ -78,14 +78,13 @@ body {
 
 /* Contenedor principal */
 .container {
-    max-width: 400px;
-    margin: 4% auto;
-    padding: 70px;
+    width: 90%;
+    margin: 2% auto;
+    padding: 30px;
     background-color: #d4c9beb4;
     display: flex;
     flex-direction: column;
     gap: 27px;
-    align-items: center;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);  
 }

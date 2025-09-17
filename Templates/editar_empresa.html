@@ -1,63 +1,59 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar Empresa Turística</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/nueva_visita.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/empresas.css') }}">
-</head>
-<body>
-    <div class="header">
-        <h1>✏️ Editar Empresa Turística</h1>
-        <p>Editando: <strong>{{ empresa.nombre }}</strong></p>
-    </div>
+{% extends "index.html" %}
 
-    <div class="container">
-        <form action="{{ url_for('editar_empresa', empresa_id=empresa.id) }}" method="POST" class="form-solicitud">
-            <!-- Datos básicos -->
-            <div class="section">
-                <h2>Información Básica</h2>
-                <div class="form-group">
-                    <label for="nombre">Nombre de la empresa *:</label>
-                    <input type="text" id="nombre" name="nombre" value="{{ empresa.nombre }}" required>
-                </div>
-                <div class="form-group">
-                    <label for="email">Correo electrónico *:</label>
-                    <input type="email" id="email" name="email" value="{{ empresa.email }}" required>
-                </div>
-                <div class="form-group">
-                    <label for="telefono">Teléfono:</label>
-                    <input type="tel" id="telefono" name="telefono" value="{{ empresa.telefono or '' }}">
-                </div>
-                <div class="form-group">
-                    <label for="direccion">Dirección:</label>
-                    <input type="text" id="direccion" name="direccion" value="{{ empresa.direccion or '' }}">
-                </div>
-                <div class="form-group">
-                    <label for="categoria">Categoría de Turismo *:</label>
-                    <select id="categoria" name="categoria" required>
-                        <option value="">Seleccione una categoría</option>
-                        <option value="identidad" {{ 'selected' if empresa.categoria == 'identidad' else '' }}>Turismo de Identidad</option>
-                        <option value="educativo" {{ 'selected' if empresa.categoria == 'educativo' else '' }}>Turismo Educativo</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="descripcion">Descripción:</label>
-                    <textarea id="descripcion" name="descripcion" rows="3">{{ empresa.descripcion or '' }}</textarea>
-                </div>
-            </div>
+{% block title %}Editar Empresa Turística{% endblock %}
 
-            <!-- Botones -->
-            <div class="botones">
-                <button type="submit" class="boton-enviar">
-                    💾 Actualizar Empresa
-                </button>
-                <a href="{{ url_for('gestionar_empresas') }}" class="boton-volver">
-                    ↩️ Volver a Gestión
-                </a>
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/editar_empresa.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="form-section">
+    <h2>Editar Empresa Turística</h2>
+    <p class="subtitle">Editando: <strong>{{ empresa.nombre }}</strong></p>
+
+    <form action="{{ url_for('editar_empresa', empresa_id=empresa.id) }}" method="POST" class="form-solicitud">
+        <!-- Datos básicos -->
+        <div class="section">
+            <h2>Información Básica</h2>
+            <div class="form-group">
+                <label for="nombre">Nombre de la empresa *:</label>
+                <input type="text" id="nombre" name="nombre" value="{{ empresa.nombre }}" required>
             </div>
-        </form>
-    </div>
-</body>
-</html>
+            <div class="form-group">
+                <label for="email">Correo electrónico *:</label>
+                <input type="email" id="email" name="email" value="{{ empresa.email }}" required>
+            </div>
+            <div class="form-group">
+                <label for="telefono">Teléfono:</label>
+                <input type="tel" id="telefono" name="telefono" value="{{ empresa.telefono or '' }}">
+            </div>
+            <div class="form-group">
+                <label for="direccion">Dirección:</label>
+                <input type="text" id="direccion" name="direccion" value="{{ empresa.direccion or '' }}">
+            </div>
+            <div class="form-group">
+                <label for="categoria">Categoría de Turismo *:</label>
+                <select id="categoria" name="categoria" required>
+                    <option value="">Seleccione una categoría</option>
+                    <option value="identidad" {{ 'selected' if empresa.categoria == 'identidad' else '' }}>Turismo de Identidad</option>
+                    <option value="educativo" {{ 'selected' if empresa.categoria == 'educativo' else '' }}>Turismo Educativo</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="descripcion">Descripción:</label>
+                <textarea id="descripcion" name="descripcion" rows="3">{{ empresa.descripcion or '' }}</textarea>
+            </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="botones">
+            <button type="submit" class="boton-enviar">
+                💾 Actualizar Empresa
+            </button>
+            <a href="{{ url_for('gestionar_empresas') }}" class="boton-volver">
+                ↩️ Volver a Gestión
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}
