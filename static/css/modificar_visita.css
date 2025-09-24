@@ -79,32 +79,3 @@ body {
     justify-content: space-between;
     margin-top: 20px;
 }
-
-.boton-guardar {
-    background-color: #467599;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 6px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.boton-guardar:hover {
-    background-color: #005f73;
-}
-
-.boton-cancelar {
-    text-decoration: none;
-    background-color: #6c757d;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 6px;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
-}
-
-.boton-cancelar:hover {
-    background-color: #5a6268;
-}

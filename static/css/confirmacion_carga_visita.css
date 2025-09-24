@@ -32,16 +32,5 @@ p {
 }
 
 a {
-    display: inline-block;
-    text-decoration: none; /* Sin subrayado */
-    background-color: #467599; /* Fondo verde */
-    color: white; /* Texto blanco */
-    padding: 10px 20px; /* Espaciado interno */
-    border-radius: 5px; /* Bordes redondeados */
-    font-size: 16px; /* Tamaño del texto */
-    transition: background-color 0.3s ease; /* Transición suave */
-}
-
-a:hover {
-    background-color: #3d6888; /* Verde más oscuro al pasar el mouse */
+    text-decoration: none;
 }

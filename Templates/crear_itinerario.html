@@ -2,10 +2,14 @@
 
 {% block title %}Crear Itinerario{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/crear_itinerario.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/buttons.css') }}">
+{% endblock %}
+
 {% block header %}
 <div class="header-custom text-white px-4 py-3 d-flex flex-column align-items-center">
     <h1 class="h3 mb-1 font-weight-bold">
-        <i class="fas fa-route mr-2"></i>
         Crear Itinerario de Visita
     </h1>
     <span class="lead font-weight-semibold">
@@ -15,22 +19,19 @@
 {% endblock %}
 
 {% block content %}
-
-    <!-- Contenedor principal -->
-    <div class="container">
-        <!-- Card principal -->
-        <div class="main-card">
-            <div class="card-header">
-                <h1><i class="fas fa-file-pdf"></i> Crear Itinerario</h1>
-                <p>Seleccione una visita confirmada para generar su itinerario en PDF</p>
-            </div>
+    <!-- Card principal -->
+    <div class="main-card">
+        <div class="card-header">
+            <h1> Crear Itinerario</h1>
+            <p>Genere un itinerario detallado para las visitas confirmadas</p>
+        </div>
 
             <div class="card-body">
                 {% if visitas %}
                     <form method="POST" action="{{ url_for('crear_itinerario') }}" class="form-itinerario">
                         <div class="form-group">
                             <label for="visita_id">
-                                <i class="fas fa-calendar-check"></i>
+
                                 Seleccionar Visita:
                             </label>
                             <select id="visita_id" name="visita_id" required class="form-select">
@@ -49,35 +50,40 @@
 
                         <div class="form-actions">
                             <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-file-pdf"></i>
+
                                 Generar Itinerario PDF
                             </button>
                         </div>
                     </form>
                 {% else %}
                     <div class="no-visitas">
-                        <i class="fas fa-exclamation-circle"></i>
-                        <h3>No hay visitas disponibles</h3>
-                        <p>No se encontraron visitas confirmadas para generar itinerarios.</p>
-                        <a href="{{ url_for('nueva_visita') }}" class="btn btn-outline">
-                            <i class="fas fa-plus"></i>
-                            Crear Nueva Visita
-                        </a>
+                        <i class="fas fa-calendar-times"></i>
+                        <h3>Sin Visitas Confirmadas</h3>
+                        <p>Aún no hay visitas confirmadas disponibles para generar itinerarios. Puede crear una nueva visita o confirmar las visitas pendientes.</p>
+                        <div class="navigation-buttons">
+                            <a href="{{ url_for('nueva_visita') }}" class="btn btn-primary">
+                                <i class="fas fa-plus-circle"></i>
+                                Crear Nueva Visita
+                            </a>
+                            <a href="{{ url_for('consultar_visitas') }}" class="btn btn-outline">
+                                <i class="fas fa-list"></i>
+                                Ver Visitas Pendientes
+                            </a>
+                        </div>
                     </div>
                 {% endif %}
             </div>
         </div>
 
-        <!-- Botones de navegación -->
-        <div class="navigation-buttons">
-            <a href="{{ url_for('index') }}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i>
-                Volver al Menú Principal
-            </a>
-            <a href="{{ url_for('consultar_visitas') }}" class="btn btn-outline">
-                <i class="fas fa-eye"></i>
-                Ver Todas las Visitas
-            </a>
-        </div>
+    </div>
+
+    <!-- Botones de navegación -->
+    <div class="navigation-buttons">
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">
+            Volver al Menú Principal
+        </a>
+        <a href="{{ url_for('consultar_visitas') }}" class="btn btn-outline">
+            Ver Todas las Visitas
+        </a>
     </div>
 {% endblock %}

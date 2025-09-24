@@ -86,31 +86,8 @@ input#visita_input::placeholder {
     margin-top: 20px;
 }
 
-.boton-confirmar {
-    background-color: #467599;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 6px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.boton-confirmar:hover {
-    background-color: #005f73;
-}
-
-.boton-volver {
-    text-decoration: none;
-    background-color: #6c757d;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 6px;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
-}
-
-.boton-volver:hover {
-    background-color: #5a6268;
+.botones {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
 }

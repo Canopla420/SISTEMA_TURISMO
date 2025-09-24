@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/nueva_visita.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/empresas.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/menu_grid.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/buttons.css') }}">
     {% block extra_css %}{% endblock %}
 </head>
 <body id="page-top">
@@ -23,31 +24,26 @@
             <!-- Accesos rápidos -->
             <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('solicitar_visita_institucion') }}">
-                    <i class="fas fa-clipboard-list"></i>
                     <span>Cargar Visita</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('gestionar_empresas') }}">
-                    <i class="fas fa-building"></i>
                     <span>Gestionar Empresas</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('consultar_empresas') }}">
-                    <i class="fas fa-search"></i>
                     <span>Consultar Empresas</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('consultar_visitas') }}">
-                    <i class="fas fa-list"></i>
                     <span>Consultar Visitas</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('crear_itinerario') }}">
-                    <i class="fas fa-route"></i>
                     <span>Crear Itinerario</span>
                 </a>
             </li>
@@ -60,7 +56,6 @@
                 {% block header %}
                 <div class="header-custom text-white px-4 py-3 d-flex flex-column align-items-center">
                     <h1 class="h3 mb-1 font-weight-bold">
-                        <i class="fas fa-university mr-2"></i>
                         Sistema de Gestión de Visitas Turísticas
                     </h1>
                     <span class="lead font-weight-semibold">

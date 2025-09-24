@@ -5,7 +5,6 @@
 {% block header %}
 <div class="header-custom text-white px-4 py-3 d-flex flex-column align-items-center">
     <h1 class="h3 mb-1 font-weight-bold">
-        <i class="fas fa-building mr-2"></i>
         Gestión de Empresas Turísticas
     </h1>
     <span class="lead font-weight-semibold">
@@ -100,7 +99,6 @@
                 </div>
             </div>
         </div>
-    </div>
     <!-- Pie de página institucional -->
     <footer style="background: #005f73; color: white; text-align: center; padding: 18px 0; margin-top: 40px; border-radius: 20px 20px 0 0; font-size: 1em;">
         <div>Municipalidad de Turismo &copy; 2025 | Dirección: Av. Principal 123, Ciudad Turística | Tel: (03456) 123456 | Email: turismo@municipalidad.gob.ar</div>
@@ -264,7 +262,7 @@
             const correoInput = document.getElementById('correo');
             
             // Datos de empresas desde el servidor
-            var empresas = {{ empresas_js|tojson|safe }};
+            const empresas = JSON.parse('{{ empresas_js|tojson|safe }}');
             
             // Función para buscar empresa por nombre
             function buscarEmpresaPorNombre(nombre) {
@@ -369,6 +367,6 @@
                     mensajeResultado.scrollIntoView({ behavior: 'smooth' });
                 });
             });
-        });
-    </script>
+    });
+</script>
 {% endblock %}

@@ -1,18 +1,25 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modificar Visita Turística</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/nueva_visita.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/empresas.css') }}">
-</head>
-<body>
-    <div class="header">
-        <h1>✏️ Modificar Visita Turística</h1>
-        <p>Edite la información de la visita programada: <strong>{{ visita.nombre_institucion }}</strong></p>
-    </div>
+{% extends "index.html" %}
 
+{% block title %}Modificar Visita{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/nueva_visita.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/empresas.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/modificar_visita.css') }}">
+{% endblock %}
+
+{% block header %}
+<div class="header-custom text-white px-4 py-3 d-flex flex-column align-items-center">
+    <h1 class="h3 mb-1 font-weight-bold">
+        Modificar Visita Turística
+    </h1>
+    <span class="lead font-weight-semibold">
+        Editando visita de: {{ visita.nombre_institucion }}
+    </span>
+</div>
+{% endblock %}
+
+{% block content %}
     <div class="container">
         <!-- Información del proceso -->
         <div class="section">
@@ -37,20 +44,20 @@
                     <input type="text" id="nombre_institucion" name="nombre_institucion" value="{{ visita.nombre_institucion }}" required>
                 </div>
                 <div class="form-group">
-                    <label for="localidad">Localidad (informativa):</label>
-                    <input type="text" id="localidad" name="localidad" value="No disponible" readonly>
+                    <label for="localidad">Localidad:</label>
+                    <input type="text" id="localidad" name="localidad" value="{{ visita.localidad if visita.localidad else '' }}" required>
                 </div>
                 <div class="form-group">
-                    <label for="responsable">Responsable/Director:</label>
-                    <input type="text" id="responsable" name="responsable" value="{{ visita.responsable }}" required>
+                    <label for="director">Director/a:</label>
+                    <input type="text" id="director" name="director" value="{{ visita.responsable }}" required>
                 </div>
                 <div class="form-group">
-                    <label for="email">Correo Electrónico:</label>
-                    <input type="email" id="email" name="email" value="{{ visita.email }}" required>
+                    <label for="correo_institucional">Correo Electrónico Institucional:</label>
+                    <input type="email" id="correo_institucional" name="correo_institucional" value="{{ visita.email }}" required>
                 </div>
                 <div class="form-group">
-                    <label for="telefono">Teléfono:</label>
-                    <input type="tel" id="telefono" name="telefono" value="{{ visita.telefono }}" required>
+                    <label for="telefono_institucion">Teléfono de la Institución:</label>
+                    <input type="tel" id="telefono_institucion" name="telefono_institucion" value="{{ visita.telefono }}" required>
                 </div>
             </div>
 
@@ -79,7 +86,11 @@
                 </div>
                 <div class="form-group">
                     <label for="nivel_educativo">Nivel Educativo:</label>
-                    <input type="text" id="nivel_educativo" name="nivel_educativo" value="{{ visita.nivel_educativo }}" required>
+                    <select id="nivel_educativo" name="nivel_educativo" required>
+                        <option value="">Seleccione el nivel</option>
+                        <option value="Primario" {% if visita.nivel_educativo == 'Primario' %}selected{% endif %}>Escuela Primaria</option>
+                        <option value="Secundario" {% if visita.nivel_educativo == 'Secundario' %}selected{% endif %}>Escuela Secundaria</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="cantidad_alumnos">Cantidad de Alumnos:</label>
@@ -90,25 +101,70 @@
                     <input type="text" id="edad_alumnos" name="edad_alumnos" value="{{ visita.edad_alumnos }}" required>
                 </div>
                 <div class="form-group">
-                    <label for="discapacidad">¿Hay Alumnos con Discapacidad?:</label>
-                    <input type="text" id="discapacidad" name="discapacidad" value="{{ visita.discapacidad }}" required>
+                    <label>¿Hay alumnos/as con discapacidad?</label>
+                    <div>
+                        <input type="radio" id="discapacidad_si" name="discapacidad" value="Sí" 
+                               {{ 'checked' if visita.discapacidad == 'Sí' }} required>
+                        <label for="discapacidad_si">Sí</label>
+                        <input type="radio" id="discapacidad_no" name="discapacidad" value="No" 
+                               {{ 'checked' if visita.discapacidad == 'No' }} required>
+                        <label for="discapacidad_no">No</label>
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label for="tipo_discapacidad">Tipo de Discapacidad:</label>
-                    <input type="text" id="tipo_discapacidad" name="tipo_discapacidad" value="{{ visita.tipo_discapacidad }}">
+                    <label for="tipo_discapacidad">Tipo de discapacidad (si aplica):</label>
+                    <input type="text" id="tipo_discapacidad" name="tipo_discapacidad" 
+                           value="{{ visita.tipo_discapacidad if visita.tipo_discapacidad else '' }}">
                 </div>
                 <div class="form-group">
-                    <label for="adaptacion">¿Requiere Adaptación?:</label>
-                    <input type="text" id="adaptacion" name="adaptacion" value="{{ visita.adaptacion }}">
+                    <label>¿Requiere adaptación?</label>
+                    <div>
+                        <input type="radio" id="adaptacion_si" name="adaptacion" value="Sí"
+                               {{ 'checked' if visita.adaptacion == 'Sí' }}>
+                        <label for="adaptacion_si">Sí</label>
+                        <input type="radio" id="adaptacion_no" name="adaptacion" value="No"
+                               {{ 'checked' if visita.adaptacion == 'No' }}>
+                        <label for="adaptacion_no">No</label>
+                    </div>
                 </div>
             </div>
 
-            <!-- C. SELECCIÓN DE LUGARES A VISITAR -->
+            <!-- C. SELECCIÓN DE EMPRESAS A VISITAR -->
             <div class="section">
-                <h2>C. Selección de Lugares a Visitar</h2>
+                <h2>C. Selección de Empresas a Visitar</h2>
+                <div id="empresas-section">
+                    <p>📝 Seleccione las empresas a visitar:</p>
+                    <div class="lugares-container" id="empresas-container">
+                        {% for empresa in empresas %}
+                        <div class="lugar-item" 
+                             data-tipo-institucion="{{ empresa.tipo_institucion }}" 
+                             data-nivel-educativo="{{ empresa.nivel_educativo }}">
+                            <input type="checkbox" 
+                                   id="empresa_{{ empresa.id }}" 
+                                   name="empresas_seleccionadas" 
+                                   value="{{ empresa.id }}"
+                                   {% if empresa.id|string in visita.lugares %}checked{% endif %}>
+                            <label for="empresa_{{ empresa.id }}" class="lugar-label">
+                                <div class="lugar-info">
+                                    <h4>🏢 {{ empresa.nombre }}</h4>
+                                    <p class="categoria">📂 {{ empresa.categoria }}</p>
+                                    <p class="contacto">📧 {{ empresa.email }}</p>
+                                    <p class="contacto">📞 {{ empresa.telefono }}</p>
+                                </div>
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% if not empresas %}
+                    <div class="info-panel warning">
+                        <p>⚠️ No hay empresas registradas en el sistema</p>
+                        <p>Primero debe <a href="/gestionar_empresas" target="_blank">registrar algunas empresas</a> para poder modificar la visita.</p>
+                    </div>
+                {% endif %}
                 <div class="form-group">
-                    <label for="lugares">Lugares Seleccionados:</label>
-                    <input type="text" id="lugares" name="lugares[]" value="{{ visita.lugares }}">
+                    <label for="observaciones_empresas">Observaciones sobre las empresas elegidas:</label>
+                    <textarea id="observaciones_empresas" name="observaciones_empresas" rows="3" placeholder="Por ejemplo: Interés particular en el área de producción, preferencias de horarios, etc.">{{ visita.observaciones }}</textarea>
                 </div>
             </div>
 
@@ -185,139 +241,9 @@
         </div>
     </div>
 
-    <!-- Estilos específicos para modificar visita -->
-    <style>
-        .header p {
-            margin: 10px 0 0 0;
-            font-size: 1.1em;
-            opacity: 0.9;
-            font-weight: 300;
-        }
+{% endblock %}
 
-        .header p strong {
-            color: #ffd60a;
-            font-weight: 600;
-        }
-
-        .form-group label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #005f73;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            font-size: 1em;
-            transition: all 0.3s ease;
-            background-color: #ffffff;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #005f73;
-            box-shadow: 0 0 0 3px rgba(0, 95, 115, 0.1);
-            transform: translateY(-1px);
-        }
-
-        .form-group input[type="radio"],
-        .form-group input[type="checkbox"] {
-            width: auto;
-            margin-right: 8px;
-            transform: scale(1.2);
-            accent-color: #005f73;
-        }
-
-        .botones {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-top: 30px;
-            flex-wrap: wrap;
-        }
-
-        .boton-enviar, .boton-volver {
-            padding: 15px 30px;
-            border: none;
-            border-radius: 10px;
-            font-size: 1.1em;
-            font-weight: 600;
-            text-decoration: none;
-            text-align: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .boton-enviar {
-            background: linear-gradient(135deg, #ffc107, #fd7e14);
-            color: white;
-            border: 2px solid #ffc107;
-        }
-
-        .boton-enviar:hover {
-            background: linear-gradient(135deg, #e0a800, #ef6f00);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 193, 7, 0.3);
-        }
-
-        .boton-volver {
-            background: linear-gradient(135deg, #6c757d, #495057);
-            color: white;
-            border: 2px solid #6c757d;
-        }
-
-        .boton-volver:hover {
-            background: linear-gradient(135deg, #5a6268, #343a40);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(108, 117, 125, 0.3);
-        }
-
-        .estado-empresa {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin: 20px 0;
-        }
-
-        .estado-item {
-            display: flex;
-            align-items: center;
-        }
-
-        .estado-badge.pendiente {
-            background-color: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeaa7;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .botones {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .boton-enviar, .boton-volver {
-                width: 100%;
-                max-width: 300px;
-            }
-            
-            .estado-empresa {
-                flex-direction: column;
-                align-items: center;
-            }
-        }
-    </style>
-</body>
-</html>
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/validaciones.js') }}"></script>
+<script src="{{ url_for('static', filename='js/filtro_empresas_modificar.js') }}"></script>
+{% endblock %}

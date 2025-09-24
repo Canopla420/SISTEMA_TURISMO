@@ -67,12 +67,15 @@ class SolicitudVisita(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     nombre_institucion = db.Column(db.String(200), nullable=False)
+    localidad = db.Column(db.String(100), nullable=True)
     responsable = db.Column(db.String(100), nullable=False)
     telefono = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(120), nullable=False)
     cantidad_alumnos = db.Column(db.Integer, nullable=False)
     edad_alumnos = db.Column(db.String(50), nullable=True)
     discapacidad = db.Column(db.String(10), default='No')
+    tipo_discapacidad = db.Column(db.String(200), nullable=True)
+    adaptacion = db.Column(db.String(10), default='No')
     empresas_seleccionadas = db.Column(db.Text, nullable=True)
     fecha_visita = db.Column(db.Date, nullable=True)
     hora_grupo1 = db.Column(db.Time, nullable=True)
@@ -325,6 +328,12 @@ def solicitar_visita_institucion():
 def modificar_visita(visita_id):
     """Modificar una visita existente"""
     visita = SolicitudVisita.query.get_or_404(visita_id)  # Buscar la visita por ID
+    
+    # Debug: mostrar los datos de la visita
+    print("\n🔍 Datos de la visita a modificar:")
+    for key, value in visita.__dict__.items():
+        if not key.startswith('_'):
+            print(f"{key}: {value}")
 
     if request.method == 'POST':
         try:
@@ -335,17 +344,35 @@ def modificar_visita(visita_id):
             
             # Actualizar todos los datos de la visita con los valores enviados desde el formulario
             visita.nombre_institucion = request.form.get('nombre_institucion')
-            visita.responsable = request.form.get('contacto_principal', '')
-            visita.telefono = request.form.get('telefono_contacto_principal', '')
-            visita.email = request.form.get('correo_institucional', '')
+            visita.localidad = request.form.get('localidad')
+            visita.responsable = request.form.get('director')
+            visita.telefono = request.form.get('telefono_institucion')
+            visita.email = request.form.get('correo_institucional')
+            
+            # Datos del contingente
+            visita.contacto_principal = request.form.get('contacto_principal')
+            visita.telefono_contacto_principal = request.form.get('telefono_contacto_principal')
+            visita.relacion_contacto = request.form.get('relacion_contacto')
+            visita.contacto_suplente = request.form.get('contacto_suplente')
+            visita.telefono_contacto_suplente = request.form.get('telefono_contacto_suplente')
+            visita.nivel_educativo = request.form.get('nivel_educativo')
             
             # Convertir cantidad_alumnos a entero
             cantidad_str = request.form.get('cantidad_alumnos')
             visita.cantidad_alumnos = int(cantidad_str) if cantidad_str and cantidad_str.strip() else 0
             
             visita.edad_alumnos = request.form.get('edad_alumnos')
-            visita.discapacidad = request.form.get('discapacidad')
-            visita.empresas_seleccionadas = ",".join(request.form.getlist('lugares[]'))  # Corregido nombre de campo
+            visita.discapacidad = request.form.get('discapacidad', 'No')
+            visita.tipo_discapacidad = request.form.get('tipo_discapacidad')
+            visita.adaptacion = request.form.get('adaptacion', 'No')
+            
+            # Manejar las empresas seleccionadas
+            empresas_seleccionadas = request.form.getlist('empresas_seleccionadas')
+            visita.empresas_seleccionadas = ','.join(empresas_seleccionadas) if empresas_seleccionadas else ''
+            
+            print("\n✅ Datos actualizados:")
+            for key, value in request.form.items():
+                print(f"{key}: {value}")
             
             # Convertir fecha de string a date object
             fecha_str = request.form.get('fecha_visita')
@@ -384,8 +411,11 @@ def modificar_visita(visita_id):
             print(f"Error al modificar visita: {e}")
             return f"Error al modificar visita: {e}", 500
 
+    # Obtener todas las empresas para el formulario
+    empresas = EmpresaTuristica.query.all()
+    
     # Renderizar el formulario con los datos actuales de la visita
-    return render_template('modificar_visita_nuevo.html', visita=visita)
+    return render_template('modificar_visita.html', visita=visita, empresas=empresas)
 
 
 @app.route('/confirmacion_visita', methods=['GET'])
@@ -862,27 +892,40 @@ def crear_itinerario():
             p = canvas.Canvas(buffer, pagesize=letter)
             width, height = letter
 
+            # Definir colores corporativos
+            color_primario = (0.06, 0.17, 0.3)  # Azul oscuro
+            color_secundario = (0, 0.37, 0.45)  # Azul medio
+            color_acento = (0.2, 0.6, 0.8)  # Azul claro más suave
+
             # Márgenes
-            left_margin = right_margin = top_margin = bottom_margin = inch
+            left_margin = right_margin = inch
+            top_margin = bottom_margin = inch * 1.2
+
+            # --- Fondo del encabezado ---
+            p.setFillColorRGB(*color_primario)
+            p.rect(0, height - 2*inch, width, 2*inch, fill=1)
 
             # --- Encabezado institucional ---
             logo_path = os.path.join('static', 'img', 'logo_esperanza.png')
             if os.path.exists(logo_path):
-                p.drawImage(logo_path, left_margin, height - top_margin - 60, width=70, height=70, mask='auto')
-            p.setFont("Helvetica-Bold", 18)
-            p.setFillColorRGB(0.1, 0.2, 0.4)
-            p.drawString(left_margin + 80, height - top_margin - 20, "Municipalidad de Esperanza")
-            p.setFont("Helvetica", 13)
-            p.setFillColorRGB(0.1, 0.2, 0.4)
-            p.drawString(left_margin + 80, height - top_margin - 40, "Dirección de Turismo")
-            p.setStrokeColorRGB(0.1, 0.2, 0.4)
-            p.setLineWidth(2)
-            p.line(left_margin, height - top_margin - 70, width - right_margin, height - top_margin - 70)
+                p.drawImage(logo_path, left_margin, height - top_margin - 60, width=80, height=80, mask='auto')
+            
+            # Texto del encabezado
+            p.setFillColorRGB(1, 1, 1)  # Blanco
+            p.setFont("Helvetica-Bold", 22)
+            p.drawString(left_margin + 100, height - top_margin - 25, "Municipalidad de Esperanza")
+            p.setFont("Helvetica", 16)
+            p.drawString(left_margin + 100, height - top_margin - 50, "Dirección de Turismo")
+
+            # Línea decorativa
+            p.setStrokeColorRGB(*color_acento)
+            p.setLineWidth(3)
+            p.line(left_margin, height - top_margin - 85, width - right_margin, height - top_margin - 85)
 
             # --- Título central ---
-            p.setFont("Helvetica-Bold", 17)
-            p.setFillColorRGB(0, 0, 0)
-            p.drawCentredString(width / 2, height - top_margin - 90, "Itinerario de Visita Turística")
+            p.setFont("Helvetica-Bold", 20)
+            p.setFillColorRGB(*color_secundario)
+            p.drawCentredString(width / 2, height - top_margin - 120, "Itinerario de Visita Turística")
 
             # --- Datos de la visita ---
             y = height - top_margin - 130
@@ -894,88 +937,181 @@ def crear_itinerario():
 
             # Obtener datos detallados de empresas
             empresas_detalle = []
-            empresas_nombres = visita.empresas_seleccionadas
-            # Intentar obtener por IDs
-            ids = [eid.strip() for eid in empresas_nombres.split(',') if eid.strip().isdigit()]
-            if ids:
-                empresas = EmpresaTuristica.query.filter(EmpresaTuristica.id.in_(ids)).all()
-                for e in empresas:
-                    empresas_detalle.append({
-                        'nombre': e.nombre,
-                        'direccion': e.direccion or '-',
-                        'telefono': e.telefono or '-',
-                        'email': e.email or '-',
-                        'categoria': e.categoria or '-'
-                    })
-            else:
-                # Si no hay IDs, asumir que son nombres separados por coma
-                nombres = [n.strip() for n in empresas_nombres.split(',') if n.strip()]
-                if nombres:
-                    empresas = EmpresaTuristica.query.filter(EmpresaTuristica.nombre.in_(nombres)).all()
-                    for e in empresas:
+            empresas_ids_str = visita.empresas_seleccionadas
+            
+            print(f"Procesando empresas seleccionadas: {empresas_ids_str}")  # Debug
+            
+            if empresas_ids_str:
+                try:
+                    # Limpiar y separar los IDs
+                    empresas_ids = [int(id.strip()) for id in empresas_ids_str.split(',') if id.strip()]
+                    print(f"IDs de empresas encontrados: {empresas_ids}")  # Debug
+                    
+                    # Buscar todas las empresas en la base de datos
+                    empresas = EmpresaTuristica.query.filter(EmpresaTuristica.id.in_(empresas_ids)).all()
+                    print(f"Empresas encontradas en DB: {len(empresas)}")  # Debug
+                    
+                    # Crear la lista de detalles
+                    for empresa in empresas:
+                        print(f"Procesando empresa: {empresa.nombre}")  # Debug
                         empresas_detalle.append({
-                            'nombre': e.nombre,
-                            'direccion': e.direccion or '-',
-                            'telefono': e.telefono or '-',
-                            'email': e.email or '-',
-                            'categoria': e.categoria or '-'
+                            'nombre': empresa.nombre,
+                            'direccion': empresa.direccion or 'No especificada',
+                            'telefono': empresa.telefono or 'No especificado',
+                            'email': empresa.email or 'No especificado',
+                            'categoria': empresa.categoria
                         })
-                # Si tampoco hay coincidencias, mostrar los nombres tal cual
-                if not empresas_detalle and nombres:
-                    for n in nombres:
-                        empresas_detalle.append({'nombre': n, 'direccion': '-', 'telefono': '-', 'email': '-', 'categoria': '-'})
+                except Exception as e:
+                    print(f"Error procesando empresas: {str(e)}")
+            
+            # Si no se encontraron empresas, mostrar mensaje
+            if not empresas_detalle:
+                print("No se encontraron empresas o hubo un error")  # Debug
+                empresas_detalle.append({
+                    'nombre': 'No hay empresas seleccionadas',
+                    'direccion': 'No especificada',
+                    'telefono': 'No especificado',
+                    'email': 'No especificado',
+                    'categoria': 'No especificada'
+                })
 
-            datos = [
+            # Sección de datos principales
+            y = height - top_margin - 180
+            p.setFillColorRGB(*color_primario)
+            p.setFont("Helvetica-Bold", 14)
+            p.drawString(left_margin, y, "INFORMACIÓN DE LA VISITA")
+            y -= 30
+
+            # Crear dos columnas para los datos
+            datos_col1 = [
                 ("Institución", visita.nombre_institucion),
-                ("Fecha de visita", fecha_formateada),
                 ("Responsable", visita.responsable),
-                ("Correo", visita.email),
                 ("Teléfono", visita.telefono),
                 ("Cantidad de alumnos", str(visita.cantidad_alumnos)),
                 ("Hora Grupo 1", hora1_formateada),
-                ("Hora Grupo 2", hora2_formateada),
-                ("Observaciones", visita.observaciones or "Ninguna"),
             ]
 
-            for label, value in datos:
-                p.setFont("Helvetica-Bold", 12)
-                p.drawString(left_margin, y, f"{label}:")
-                p.setFont("Helvetica", 12)
-                p.drawString(left_margin + 150, y, str(value))
-                y -= line_space
+            datos_col2 = [
+                ("Fecha de visita", fecha_formateada),
+                ("Correo", visita.email),
+                ("Discapacidad", visita.discapacidad if visita.discapacidad else "No"),
+                ("Edad de alumnos", visita.edad_alumnos),
+                ("Hora Grupo 2", hora2_formateada if hora2_formateada else "No aplica"),
+            ]
+
+            # Dibujando datos en dos columnas
+            col2_x = width/2 + 20
+            y_original = y
+            
+            for datos, x_pos in [(datos_col1, left_margin), (datos_col2, col2_x)]:
+                y = y_original
+                for label, value in datos:
+                    # Fondo del campo
+                    p.setFillColorRGB(0.97, 0.97, 1.0)  # Fondo azulado muy suave
+                    p.rect(x_pos - 5, y - 5, 230, 25, fill=1)
+                    
+                    # Etiqueta
+                    p.setFillColorRGB(*color_secundario)
+                    p.setFont("Helvetica-Bold", 11)
+                    p.drawString(x_pos, y, f"{label}:")
+                    
+                    # Valor (ajustado el espaciado)
+                    p.setFillColorRGB(0, 0, 0)
+                    p.setFont("Helvetica", 11)
+                    etiqueta_width = p.stringWidth(f"{label}:", "Helvetica-Bold", 11)
+                    p.drawString(x_pos + etiqueta_width + 10, y, str(value))
+                    y -= 35
 
             # Sección de empresas a visitar
             if empresas_detalle:
-                y -= 10
-                p.setFont("Helvetica-Bold", 13)
-                p.setFillColorRGB(0.1, 0.2, 0.4)
-                p.drawString(left_margin, y, "Empresas a Visitar:")
-                y -= line_space
-                p.setFillColorRGB(0, 0, 0)
-                for emp in empresas_detalle:
-                    p.setFont("Helvetica-Bold", 12)
-                    p.drawString(left_margin + 10, y, f"• {emp['nombre']}")
-                    y -= line_space - 6
-                    p.setFont("Helvetica", 11)
-                    p.drawString(left_margin + 30, y, f"Dirección: {emp['direccion']}")
-                    y -= line_space - 10
-                    p.drawString(left_margin + 30, y, f"Teléfono: {emp['telefono']}   Email: {emp['email']}")
-                    y -= line_space - 10
-                    p.drawString(left_margin + 30, y, f"Categoría: {emp['categoria']}")
-                    y -= line_space
+                # Sección de empresas
+                y -= 50
+                p.setFillColorRGB(*color_primario)
+                p.setFont("Helvetica-Bold", 14)
+                p.drawString(left_margin, y, "EMPRESAS A VISITAR")
+                y -= 30
 
-            # Línea separadora final
-            p.setStrokeColorRGB(0.7, 0.7, 0.7)
-            p.setLineWidth(1)
-            p.line(left_margin, y + 10, width - right_margin, y + 10)
+                # Calcular altura necesaria para todas las empresas
+                altura_por_empresa = 120  # Altura base por empresa
+                altura_total = altura_por_empresa * len(empresas_detalle)
+                
+                # Crear un marco para las empresas con fondo muy suave
+                p.setFillColorRGB(0.95, 0.98, 1.0)
+                p.rect(left_margin - 10, y - altura_total + 10, width - 2*inch + 20, altura_total + 10, fill=1)
+
+                for i, emp in enumerate(empresas_detalle):
+                    # Nombre de la empresa
+                    p.setFillColorRGB(*color_secundario)
+                    p.setFont("Helvetica-Bold", 13)
+                    nombre = f"{i+1}. {emp['nombre'].strip()}"
+                    p.drawString(left_margin + 10, y, nombre)
+                    
+                    # Información de la empresa
+                    y -= 25
+                    p.setFillColorRGB(0, 0, 0)
+                    p.setFont("Helvetica", 11)
+                    
+                    # Dirección
+                    direccion = emp['direccion'].replace('-', 'No especificada').strip()
+                    p.drawString(left_margin + 30, y, f"Dirección: {direccion}")
+                    
+                    # Teléfono y Email
+                    y -= 20
+                    telefono = emp['telefono'].strip()
+                    email = emp['email'].strip()
+                    p.drawString(left_margin + 30, y, f"Teléfono: {telefono}")
+                    # Calculamos el ancho del texto del teléfono para posicionar el email
+                    tel_width = p.stringWidth(f"Teléfono: {telefono}", "Helvetica", 11)
+                    p.drawString(left_margin + 50 + tel_width, y, f"Email: {email}")
+                    
+                    # Categoría
+                    y -= 20
+                    categoria = emp['categoria'].strip()
+                    p.drawString(left_margin + 30, y, f"Categoría: {categoria}")
+                    
+                    # Línea separadora entre empresas
+                    if emp != empresas_detalle[-1]:
+                        y -= 25
+                        p.setStrokeColorRGB(0.8, 0.8, 0.8)
+                        p.setLineWidth(0.5)
+                        p.line(left_margin + 20, y, width - right_margin - 20, y)
+                        y -= 15  # Espacio adicional después de la línea            # Sección de observaciones si existen
+            if visita.observaciones:
+                y -= 30
+                p.setFillColorRGB(*color_primario)
+                p.setFont("Helvetica-Bold", 14)
+                p.drawString(left_margin, y, "OBSERVACIONES")
+                y -= 25
+                
+                # Marco para las observaciones
+                p.setFillColorRGB(0.95, 0.95, 0.95)
+                observaciones_height = 50
+                p.rect(left_margin - 5, y - observaciones_height + 15, width - 2*inch + 10, observaciones_height, fill=1)
+                
+                p.setFillColorRGB(0, 0, 0)
+                p.setFont("Helvetica", 11)
+                p.drawString(left_margin + 10, y - 10, visita.observaciones)
+                y -= observaciones_height
 
             # --- Pie de página ---
-            p.setFont("Helvetica-Oblique", 10)
-            p.setFillColorRGB(0.3, 0.3, 0.3)
+            # Fondo del pie de página
+            p.setFillColorRGB(*color_primario)
+            p.rect(0, 0, width, bottom_margin + 60, fill=1)
+            
+            # Texto del pie de página
+            p.setFont("Helvetica", 10)
+            p.setFillColorRGB(1, 1, 1)
             p.drawCentredString(width / 2, bottom_margin + 20, "Sistema de Gestión de Visitas Turísticas - Municipalidad de Esperanza")
-            p.setFont("Helvetica", 11)
-            p.setFillColorRGB(0, 0, 0)
-            p.drawString(left_margin, bottom_margin + 40, "Firma y Sello: ............................................................")
+            
+            # Espacio para firma
+            p.setStrokeColorRGB(1, 1, 1)
+            p.setLineWidth(1)
+            p.line(left_margin, bottom_margin + 40, width/2 - 20, bottom_margin + 40)
+            p.line(width/2 + 20, bottom_margin + 40, width - right_margin, bottom_margin + 40)
+            
+            p.setFont("Helvetica-Bold", 11)
+            p.drawString(left_margin + 20, bottom_margin + 45, "Firma y Sello:")
+            p.drawString(width/2 + 40, bottom_margin + 45, "Aclaración:")
 
             p.save()
             

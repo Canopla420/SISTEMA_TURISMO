@@ -61,47 +61,5 @@ body {
 }
 
 
-/* Botón "Enviar consulta" */
-.boton-enviar {
-    background-color: #356386;
-    color: white;
-    padding: 12px 24px;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
 
-.boton-enviar:hover {
-    background-color: #005f73;
-    transform: scale(1.05);
-}
-
-.boton-enviar:active {
-    background-color: #003f54;
-    transform: scale(0.95);
-}
-
-/* Botón "Volver al menú" */
-.boton-volver {
-    background-color: #64788a;
-    color: white;
-    padding: 12px 24px;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.boton-volver:hover {
-    background-color: #5a6268;
-    transform: scale(1.05);
-}
-
-.boton-volver:active {
-    background-color: #003f54;
-    transform: scale(0.95);
-}
 

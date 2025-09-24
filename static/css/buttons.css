@@ -1,0 +1,149 @@
+/* Estilos de botones comunes */
+.botones {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+/* Botones principales */
+.boton-enviar, .boton-volver {
+    padding: 15px 30px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1em;
+    font-weight: 600;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Botón de enviar (azul principal) */
+.boton-enviar {
+    background: linear-gradient(135deg, #0f2c4c 0%, #1a4a73 100%);
+    color: white;
+    border: 2px solid #0f2c4c;
+}
+
+.boton-enviar:hover {
+    background: linear-gradient(135deg, #1a4a73 0%, #0f2c4c 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(15, 44, 76, 0.3);
+}
+
+/* Botón de volver (gris) */
+.boton-volver {
+    background: linear-gradient(135deg, #64788a 0%, #556b7d 100%);
+    color: white;
+    border: 2px solid #64788a;
+}
+
+.boton-volver:hover {
+    background: linear-gradient(135deg, #556b7d 0%, #465870 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(100, 120, 138, 0.3);
+}
+
+/* Botones de acción en tablas */
+.boton-accion {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9em;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    margin: 0 5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Botón confirmar (azul principal) */
+.boton-accion.confirmar {
+    background: linear-gradient(135deg, #0f2c4c 0%, #1a4a73 100%);
+    color: white;
+    border: 2px solid #0f2c4c;
+}
+
+.boton-accion.confirmar:hover {
+    background: linear-gradient(135deg, #1a4a73 0%, #0f2c4c 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(15, 44, 76, 0.2);
+}
+
+/* Botón rechazar (rojo azulado) */
+.boton-accion.rechazar {
+    background: linear-gradient(135deg, #c23d3d 0%, #a33434 100%);
+    color: white;
+    border: 2px solid #c23d3d;
+}
+
+.boton-accion.rechazar:hover {
+    background: linear-gradient(135deg, #a33434 0%, #8a2c2c 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(194, 61, 61, 0.2);
+}
+
+/* Botón editar (azul secundario) */
+.boton-accion.editar {
+    background: linear-gradient(135deg, #356386 0%, #2a4f6b 100%);
+    color: white;
+    border: 2px solid #356386;
+}
+
+.boton-accion.editar:hover {
+    background: linear-gradient(135deg, #2a4f6b 0%, #1f3b50 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(53, 99, 134, 0.2);
+}
+
+/* Botón eliminar (gris) */
+.boton-accion.eliminar {
+    background: linear-gradient(135deg, #64788a 0%, #556b7d 100%);
+    color: white;
+    border: 2px solid #64788a;
+}
+
+.boton-accion.eliminar:hover {
+    background: linear-gradient(135deg, #556b7d 0%, #465870 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(100, 120, 138, 0.2);
+}
+
+/* Botón pendiente (amarillo suave) */
+.boton-accion.pendiente {
+    background: linear-gradient(135deg, #e6a23c 0%, #d48b1f 100%);
+    color: white;
+    border: 2px solid #e6a23c;
+}
+
+.boton-accion.pendiente:hover {
+    background: linear-gradient(135deg, #d48b1f 0%, #bd7b1c 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(230, 162, 60, 0.2);
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    .botones {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .boton-enviar, .boton-volver {
+        width: 100%;
+        max-width: 300px;
+    }
+    
+    .boton-accion {
+        width: 100%;
+        margin: 5px 0;
+        justify-content: center;
+    }
+}

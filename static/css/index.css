@@ -89,28 +89,3 @@ body {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);  
 }
 
-/* Botones */
-.boton {
-    display: inline-block;
-    text-decoration: none;
-    background-color: #356386;
-    color: white;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-size: 22px;
-    font-weight: bold;
-    text-align: center;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    width: 100%; /* Botones ocupan todo el ancho */
-    max-width: 400px; /* Máximo ancho */
-}
-
-.boton:hover {
-    background-color: #274f6e;
-    transform: scale(1.05);
-}
-
-.boton:active {
-    background-color: #274f6e;
-    transform: scale(0.95);
-}
